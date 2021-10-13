@@ -1,6 +1,8 @@
 # Docker Plex & Usenet Media Server
 
-docker-based plex & usenet media server using custom subdomains over https
+docker-based server using custom subdomains over https
+
+Mostly copied from [klutchell's mediaserver](https://github.com/klutchell/mediaserver)
 
 ## Motivation
 
@@ -10,15 +12,7 @@ docker-based plex & usenet media server using custom subdomains over https
 
 ## Features
 
-- [Plex](https://plex.tv/) organizes video, music and photos from personal media libraries and streams them to smart TVs, streaming boxes and mobile devices.
-- [NZBGet](https://nzbget.net/) is a usenet downloader, written in C++ and designed with performance in mind to achieve maximum download speed by using very little system resources.
-- [Sonarr](https://sonarr.tv/) (formerly NZBdrone) is a PVR for usenet and bittorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
-- [Radarr](https://radarr.video/) - A fork of Sonarr to work with movies à la Couchpotato.
-- [NZBHydra2](https://github.com/theotherp/nzbhydra2) is a meta search application for NZB indexers, the "spiritual successor" to NZBmegasearcH, and an evolution of the original application NZBHydra.
-- [Prowlarr](https://github.com/Prowlarr/Prowlarr) is a indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps.
-- [Ombi](https://ombi.io/) is a self-hosted web application that automatically gives your shared Plex or Emby users the ability to request content by themselves.
 - [Netdata](https://www.netdata.cloud/) - Troubleshoot slowdowns and anomalies in your infrastructure with thousands of metrics, interactive visualizations, and insightful health alarms.
-- [Duplicati](https://www.duplicati.com/) - Free backup software to store encrypted backups online.
 - [Traefik](https://traefik.io/) is a modern HTTP reverse proxy and load balancer that makes deploying microservices easy.
 
 ## Requirements
@@ -115,11 +109,11 @@ For Nzbget the default credentials are `nzbget:tegbzn6789` and can be changed un
 
 For NZBHydra2 you can add users under Config->Authorization.  
 
-## Author
+## Original Author
 
 Kyle Harding <https://klutchell.dev>
 
-[Buy me a beer](https://buymeacoffee.com/klutchell)
+[Buy them a beer](https://buymeacoffee.com/klutchell)
 
 ## Acknowledgments
 
