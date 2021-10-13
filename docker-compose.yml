@@ -24,3 +24,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - default
+
+ # https://github.com/thomseddon/traefik-forward-auth
+  traefik-forward-auth:
+    image: thomseddon/traefik-forward-auth:2
+    environment:
+      - PROVIDERS_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - PROVIDERS_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - SECRET=${AUTH_SECRET}
+      - WHITELIST=${OAUTH_WHITELIST}
+      - LOG_LEVEL=debug
+    networks:
+      - default
