@@ -1,0 +1,47 @@
+version: "3.7"
+
+networks:
+  default:
+
+services:
+  # https://hub.docker.com/r/netdata/netdata
+  netdata:
+    image: netdata/netdata@sha256:79defa6ad1c3367b5712fd98e6a45741faf02e1e0baf0638a46f197f5e869d1e
+    restart: unless-stopped
+    hostname: ${NETDATA_HOST}
+    environment:
+      PGID: ${DOCKER_PGID}
+      TZ: ${TZ}
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - default
+  # https://hub.docker.com/r/adguard/adguardhome
+  adguard:
+    image: adguard/adguardhome@sha256:cbb7ca136afcc5649f64e17af3cab3100315a1b4489958e87c34d2d8d5efaa4c
+    restart: unless-stopped
+    hostname: ${ADGUARD_HOST}
+    expose:
+      - "80"
+      - "3000"
+      - "443"
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
+      - /mnt/adguard/work:/opt/adguardhome/work
+      - /mnt/adguard/conf:/opt/adguardhome/conf
+    networks:
+      - default
