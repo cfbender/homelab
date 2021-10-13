@@ -17,7 +17,7 @@ Mostly copied from [klutchell's mediaserver](https://github.com/klutchell/medias
 
 ## Requirements
 
-- dedicated server or PC with plenty of storage
+- dedicated server or PC
 - [docker](https://docs.docker.com/install/linux/docker-ce/debian/) and [docker-compose](https://docs.docker.com/compose/install/#install-compose)
 - (optional) personal domain with configurable sub-domains (eg. plex.example.com)
 
@@ -75,7 +75,9 @@ Access from any other IP will result in "403 Forbidden" giving you some peice of
 This functionality can be enabled/disabled per service in `docker-compose.letsencrypt.yml`
 with the `ipallowlist` middleware.
 
-By default Plex, Jellyfin, Ombi, and NZBHydra2 will allow all traffic.
+### traefik-forward-auth
+
+Uses [traefik-forward-auth](https://github.com/thomseddon/traefik-forward-auth) to handle OAuth through google. Just follow the setup instructions there, and fill in the relevant fields in env
 
 ### basicauth
 
@@ -103,12 +105,6 @@ By default only Duplicati and Netdata have basic http auth enabled.
 For the remaining services I suggest enabling the built-in authentication via the app.
 This avoids the need to add manual exceptions for API access where required and simplifies our proxy rules.
 
-For Sonarr, Radarr, Prowlar you can enable authentication under Settings->General->Security.
-
-For Nzbget the default credentials are `nzbget:tegbzn6789` and can be changed under Settings->Security.
-
-For NZBHydra2 you can add users under Config->Authorization.  
-
 ## Original Author
 
 Kyle Harding <https://klutchell.dev>
@@ -120,13 +116,6 @@ Kyle Harding <https://klutchell.dev>
 I didn't create any of these docker images myself, so credit goes to the
 maintainers, and the original software creators.
 
-- <https://hub.docker.com/r/linuxserver/plex/>
-- <https://hub.docker.com/r/linuxserver/nzbget/>
-- <https://hub.docker.com/r/linuxserver/sonarr/>
-- <https://hub.docker.com/r/linuxserver/radarr/>
-- <https://hub.docker.com/r/linuxserver/prowlarr/>
-- <https://hub.docker.com/r/linuxserver/nzbhydra2/>
-- <https://hub.docker.com/r/linuxserver/ombi>
-- <https://hub.docker.com/r/linuxserver/duplicati/>
 - <https://hub.docker.com/r/netdata/netdata/>
+- <https://hub.docker.com/r/thomseddon/traefik-forward-auth>
 - <https://hub.docker.com/_/traefik/>
