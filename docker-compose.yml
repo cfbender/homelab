@@ -37,6 +37,14 @@ services:
     networks:
       - default
 
+  esphome:
+    image: esphome/esphome
+    restart: unless-stopped
+    environment:
+      TX: ${TZ}
+    networks:
+      - default
+
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth@sha256:69a2c985d2c518b6f0e77161a98628a148a5d964e4e84fc52cc62e19bb4da634

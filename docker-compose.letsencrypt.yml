@@ -27,6 +27,16 @@ services:
       traefik.http.services.home.loadbalancer.server.port: 8123
       traefik.http.services.home.loadbalancer.server.scheme: http
 
+  esphome:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.esphome.tls.certresolver: prod
+      traefik.http.routers.esphome.rule: Host(`${ESPHOME_HOST}`)
+      traefik.http.routers.esphome.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.esphome.loadbalancer.server.port: 6052
+      traefik.http.services.esphome.loadbalancer.server.scheme: http
+
   # https://hub.docker.com/_/traefik/
   traefik:
     image: traefik:v2.5.3
