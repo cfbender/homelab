@@ -6,7 +6,7 @@ networks:
 services:
   # https://hub.docker.com/r/netdata/netdata
   netdata:
-    image: netdata/netdata@sha256:79defa6ad1c3367b5712fd98e6a45741faf02e1e0baf0638a46f197f5e869d1e
+    image: netdata/netdata@sha256:711e735595d8981b72ac22cd6fb9daae3e7086475dc40fddad2b875ca1b905e9
     restart: unless-stopped
     hostname: ${NETDATA_HOST}
     environment:
@@ -27,7 +27,7 @@ services:
 
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
-    image: thomseddon/traefik-forward-auth:2
+    image: thomseddon/traefik-forward-auth@sha256:69a2c985d2c518b6f0e77161a98628a148a5d964e4e84fc52cc62e19bb4da634
     environment:
       - PROVIDERS_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - PROVIDERS_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
