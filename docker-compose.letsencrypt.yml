@@ -17,6 +17,16 @@ services:
       traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders: X-Forwarded-User
       traefik.http.services.traefik-forward-auth.loadbalancer.server.port: 4181
 
+  home:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.home.tls.certresolver: prod
+      traefik.http.routers.home.rule: Host(`${HOME_ASSISTANT_HOST}`)
+      traefik.http.routers.home.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.home.loadbalancer.server.port: 8123
+      traefik.http.services.home.loadbalancer.server.scheme: http
+
   # https://hub.docker.com/_/traefik/
   traefik:
     image: traefik:v2.5.3

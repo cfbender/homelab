@@ -25,6 +25,18 @@ services:
     networks:
       - default
 
+  home:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    privileged: true
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ${CONFIG_DIR}/home:/config
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - default
+
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth@sha256:69a2c985d2c518b6f0e77161a98628a148a5d964e4e84fc52cc62e19bb4da634

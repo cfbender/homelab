@@ -4,3 +4,6 @@ services:
   netdata:
     ports:
       - "19999:19999/tcp"
+  home:
+    ports:
+      - "8123:8123/tcp"
