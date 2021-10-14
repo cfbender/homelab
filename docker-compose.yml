@@ -41,7 +41,9 @@ services:
     image: esphome/esphome
     restart: unless-stopped
     environment:
-      TX: ${TZ}
+      TZ: ${TZ}
+    volumes:
+      - ${CONFIG_DIR}/esphome:/config
     networks:
       - default
 
