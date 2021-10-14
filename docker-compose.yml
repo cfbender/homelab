@@ -28,11 +28,15 @@ services:
   home:
     image: ghcr.io/home-assistant/home-assistant:stable
     restart: unless-stopped
-    privileged: true
     environment:
       TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
+      UMASK: 007
+      PACKAGES: iputils
     volumes:
       - ${CONFIG_DIR}/home:/config
+      - ${CONFIG_DIR}/home/docker:/etc/services.d/home-assistant
       - /etc/localtime:/etc/localtime:ro
     networks:
       - default
