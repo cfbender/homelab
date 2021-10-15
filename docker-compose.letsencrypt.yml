@@ -60,6 +60,16 @@ services:
       traefik.http.services.personal-site.loadbalancer.server.port: ${WWW_PORT}
       traefik.http.services.personal-site.loadbalancer.server.scheme: http
 
+  adguard:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.adguard.tls.certresolver: prod
+      traefik.http.routers.adguard.rule: Host(`${ADGUARD_HOST}`)
+      traefik.http.routers.adguard.middlewares: hsts-header
+      traefik.http.services.adguard.loadbalancer.server.port: ${ADGUARD_PORT}
+      traefik.http.services.adguard.loadbalancer.server.scheme: http
+
   # https://hub.docker.com/_/traefik/
   traefik:
     image: traefik:v2.5.3

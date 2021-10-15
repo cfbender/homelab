@@ -65,6 +65,7 @@ services:
     networks:
       - default
 
+  # https://github.com/cfbender/personal-site
   personal-site:
     build:
       context: ../personal-site
@@ -78,6 +79,20 @@ services:
       HOSTNAME: ${PERSONAL_SITE_HOST}
     networks:
       - default
+
+  # https://registry.hub.docker.com/r/adguard/adguardhome
+  adguard:
+    image: adguard/adguardhome
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ${DATA_DIR}/adguard:/opt/adguardhome/work
+      - ${CONFIG_DIR}/adguard:/opt/adguardhome/conf
+    ports:
+      - "53:53/tcp"
+      - "3000:3000/tcp"
+    expose:
+      - 53
 
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
