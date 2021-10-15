@@ -1,4 +1,4 @@
-# Docker Plex & Usenet Media Server
+# Docker Home Server
 
 docker-based server using custom subdomains over https
 
