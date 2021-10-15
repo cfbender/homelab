@@ -14,6 +14,11 @@ Mostly copied from [klutchell's mediaserver](https://github.com/klutchell/medias
 
 - [Netdata](https://www.netdata.cloud/) - Troubleshoot slowdowns and anomalies in your infrastructure with thousands of metrics, interactive visualizations, and insightful health alarms.
 - [Traefik](https://traefik.io/) is a modern HTTP reverse proxy and load balancer that makes deploying microservices easy.
+- [Home Assistant](https://www.home-assistant.io/) - Open source home automation that puts local control and privacy first.
+- [ESPHome](https://esphome.io/) is a system to control your ESP8266/ESP32 by simple yet powerful configuration files and control them remotely through Home Automation systems.
+- [code-server](https://github.com/cdr/code-server) - Run VS Code on any machine anywhere and access it in the browser.
+- [personal-site](https://github.com/cfbender/personal-site) - my personal site, built with Phoenix LiveView
+- [AdGuard Home](https://adguard.com/en/adguard-home/overview.html) is a network-wide software for blocking ads & tracking. 
 
 ## Requirements
 
@@ -119,3 +124,7 @@ maintainers, and the original software creators.
 - <https://hub.docker.com/r/netdata/netdata/>
 - <https://hub.docker.com/r/thomseddon/traefik-forward-auth>
 - <https://hub.docker.com/_/traefik/>
+- <https://hub.docker.com/r/linuxserver/homeassistant>
+- <https://hub.docker.com/r/esphome/esphome>
+- <https://hub.docker.com/r/linuxserver/code-server>
+- <https://hub.docker.com/r/adguard/adguardhome>
