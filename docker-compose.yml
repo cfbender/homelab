@@ -48,6 +48,20 @@ services:
     networks:
       - default
 
+  code:
+    image: lscr.io/linuxserver/code-server
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
+      SUDO_PASSWORD_HASH: ${CODE_SUDO_PASSWORD_HASH} 
+    volumes:
+      - ${CONFIG_DIR}/code:/config
+      - ${CODE_DIR}:/home/code
+    networks:
+      - default
+
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth@sha256:69a2c985d2c518b6f0e77161a98628a148a5d964e4e84fc52cc62e19bb4da634

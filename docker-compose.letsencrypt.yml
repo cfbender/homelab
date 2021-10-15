@@ -20,7 +20,6 @@ services:
   home:
     labels:
       traefik.enable: "true"
-      traefik.docker.network: homelab_default
       traefik.http.routers.home.tls.certresolver: prod
       traefik.http.routers.home.rule: Host(`${HOME_ASSISTANT_HOST}`)
       traefik.http.routers.home.middlewares: hsts-header
@@ -36,6 +35,16 @@ services:
       traefik.http.routers.esphome.middlewares: hsts-header, traefik-forward-auth
       traefik.http.services.esphome.loadbalancer.server.port: 6052
       traefik.http.services.esphome.loadbalancer.server.scheme: http
+
+  code:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.code.tls.certresolver: prod
+      traefik.http.routers.code.rule: Host(`${CODE_HOST}`)
+      traefik.http.routers.code.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.code.loadbalancer.server.port: 8443
+      traefik.http.services.code.loadbalancer.server.scheme: http
 
   # https://hub.docker.com/_/traefik/
   traefik:
