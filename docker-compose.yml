@@ -82,7 +82,7 @@ services:
 
   # https://registry.hub.docker.com/r/adguard/adguardhome
   adguard:
-    image: adguard/adguardhome
+    image: adguard/adguardhome@sha256:de7d791b814560663fe95f9812fca2d6dd9d6507e4b1b29926cc7b4a08a676ad
     restart: unless-stopped
     network_mode: host
     volumes:
