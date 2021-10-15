@@ -79,3 +79,5 @@ services:
       traefik.http.middlewares.basicauth.basicauth.usersfile: /etc/traefik/.htpasswd
       traefik.http.middlewares.ipallowlist.ipwhitelist.sourcerange: "${IPALLOWLIST}"
       traefik.http.middlewares.hsts-header.headers.customResponseHeaders.Strict-Transport-Security: "max-age=63072000"
+    extra_hosts:
+      - host.docker.internal:172.17.0.1
