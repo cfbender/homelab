@@ -25,6 +25,7 @@ services:
     networks:
       - default
 
+  # https://www.home-assistant.io/
   home:
     image: lscr.io/linuxserver/homeassistant@sha256:cac8fb5fe794934d88dcbfd0dbcda1ebc657319b5a0a057b7d8df0fb19d5d202
     restart: unless-stopped
@@ -37,6 +38,7 @@ services:
       - ${CONFIG_DIR}/home:/config
       - /etc/localtime:/etc/localtime:ro
 
+  # https://github.com/esphome/esphome
   esphome:
     image: esphome/esphome@sha256:c29d71c7579cd988220ea551807b19d6354e6bfa3aa8bb37163671ce68e06ad0
     restart: unless-stopped
@@ -48,6 +50,7 @@ services:
     networks:
       - default
 
+  # https://github.com/cdr/code-server
   code:
     image: lscr.io/linuxserver/code-server@sha256:ccb72549eec0546024cf19764d1acda0566f42e558c8badc3975226d8e909e33
     restart: unless-stopped
