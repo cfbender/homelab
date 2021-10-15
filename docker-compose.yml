@@ -46,6 +46,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
+      ESPHOME_DASHBOARD_USE_PING: "true"
     volumes:
       - ${CONFIG_DIR}/esphome:/config
     networks:
