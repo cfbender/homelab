@@ -1,2 +1,5 @@
 netdata/netdata:latest
 thomseddon/traefik-forward-auth:2
+lscr.io/linuxserver/homeassistant
+esphome/esphome
+lscr.io/linuxserver/code-server

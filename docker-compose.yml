@@ -6,7 +6,7 @@ networks:
 services:
   # https://hub.docker.com/r/netdata/netdata
   netdata:
-    image: netdata/netdata@sha256:711e735595d8981b72ac22cd6fb9daae3e7086475dc40fddad2b875ca1b905e9
+    image: netdata/netdata@sha256:41f92ccb279ceb750bcaae2958b4fc13a425913a3e54b3d59324ccef118e4507
     restart: unless-stopped
     hostname: ${NETDATA_HOST}
     environment:
@@ -26,7 +26,7 @@ services:
       - default
 
   home:
-    image: lscr.io/linuxserver/homeassistant
+    image: lscr.io/linuxserver/homeassistant@sha256:cac8fb5fe794934d88dcbfd0dbcda1ebc657319b5a0a057b7d8df0fb19d5d202
     restart: unless-stopped
     network_mode: host
     environment:
@@ -38,7 +38,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
 
   esphome:
-    image: esphome/esphome
+    image: esphome/esphome@sha256:c29d71c7579cd988220ea551807b19d6354e6bfa3aa8bb37163671ce68e06ad0
     restart: unless-stopped
     environment:
       TZ: ${TZ}
@@ -49,7 +49,7 @@ services:
       - default
 
   code:
-    image: lscr.io/linuxserver/code-server
+    image: lscr.io/linuxserver/code-server@sha256:ccb72549eec0546024cf19764d1acda0566f42e558c8badc3975226d8e909e33
     restart: unless-stopped
     environment:
       TZ: ${TZ}
