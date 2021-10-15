@@ -7,3 +7,19 @@ services:
   home:
     ports:
       - "8123:8123/tcp"
+
+  esphome:
+    ports:
+      - "6052:6052/tcp"
+
+  code:
+    ports:
+      - "8443:8443/tcp"
+
+  personal-site:
+    ports:
+      - ${WWW_PORT}:${WWW_PORT} 
+
+  adguard:
+    ports:
+      - ${ADGUARD_PORT}:${ADGUARD_PORT}
