@@ -7,7 +7,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.netdata.tls.certresolver: prod
       traefik.http.routers.netdata.rule: Host(`${NETDATA_HOST}`)
-      traefik.http.routers.netdata.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.netdata.middlewares: hsts-header, basicauth
 
   traefik-forward-auth:
     labels:
@@ -23,7 +23,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.home.tls.certresolver: prod
       traefik.http.routers.home.rule: Host(`${HOME_ASSISTANT_HOST}`)
-      traefik.http.routers.home.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.home.middlewares: hsts-header, basicauth
       traefik.http.services.home.loadbalancer.server.port: 8123
       traefik.http.services.home.loadbalancer.server.scheme: http
 
@@ -33,7 +33,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.esphome.tls.certresolver: prod
       traefik.http.routers.esphome.rule: Host(`${ESPHOME_HOST}`)
-      traefik.http.routers.esphome.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.esphome.middlewares: hsts-header, basicauth
       traefik.http.services.esphome.loadbalancer.server.port: 6052
       traefik.http.services.esphome.loadbalancer.server.scheme: http
 
@@ -50,7 +50,7 @@ services:
       - 443:443/tcp
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${CONFIG_DIR}/traefik:/etc/traefik:rw
+      - ${DATA_DIR}/traefik:/etc/traefik:rw
     command:
       - "--log.level=INFO"
       - "--api=true"
@@ -73,7 +73,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.traefik.tls.certresolver: prod
       traefik.http.routers.traefik.rule: Host(`${TRAEFIK_HOST}`)
-      traefik.http.routers.traefik.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.traefik.middlewares: hsts-header, basicauth
       traefik.http.routers.traefik.service: api@internal
       traefik.http.middlewares.test-auth.basicauth.users: "${BASICAUTH_USERS}"
       traefik.http.middlewares.basicauth.basicauth.usersfile: /etc/traefik/.htpasswd
