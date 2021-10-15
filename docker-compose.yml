@@ -65,6 +65,20 @@ services:
     networks:
       - default
 
+  personal-site:
+    build:
+      context: ../personal-site
+      dockerfile: Dockerfile
+      args:
+        - SHOW_DASHBOARD=true
+    restart: unless-stopped
+    environment:
+      PORT: ${WWW_PORT}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      HOSTNAME: ${PERSONAL_SITE_HOST}
+    networks:
+      - default
+
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth@sha256:69a2c985d2c518b6f0e77161a98628a148a5d964e4e84fc52cc62e19bb4da634
@@ -74,5 +88,7 @@ services:
       - SECRET=${AUTH_SECRET}
       - WHITELIST=${OAUTH_WHITELIST}
       - LOG_LEVEL=debug
+      - AUTH_HOST=${AUTH_HOST}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
     networks:
       - default
