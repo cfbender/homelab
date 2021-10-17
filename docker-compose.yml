@@ -24,6 +24,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   # https://www.home-assistant.io/
   home:
@@ -37,6 +40,9 @@ services:
     volumes:
       - ${CONFIG_DIR}/home:/config
       - /etc/localtime:/etc/localtime:ro
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   # https://github.com/esphome/esphome
   esphome:
@@ -49,6 +55,9 @@ services:
       - ${CONFIG_DIR}/esphome:/config
     networks:
       - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   # https://github.com/cdr/code-server
   code:
@@ -64,6 +73,9 @@ services:
       - ${CODE_DIR}:/home/code
     networks:
       - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   # https://github.com/cfbender/personal-site
   personal-site:
@@ -79,6 +91,9 @@ services:
       HOSTNAME: ${PERSONAL_SITE_HOST}
     networks:
       - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   # https://registry.hub.docker.com/r/adguard/adguardhome
   adguard:
@@ -93,6 +108,9 @@ services:
       - "3000:3000/tcp"
     expose:
       - 53
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
@@ -107,3 +125,6 @@ services:
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
     networks:
       - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1

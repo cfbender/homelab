@@ -85,8 +85,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_DIR}/traefik:/etc/traefik:rw
     dns:
-      - 8.8.8.8
-      - 4.4.4.4
+      - 1.1.1.1
+      - 1.0.0.1
     command:
       - "--log.level=INFO"
       - "--api=true"
