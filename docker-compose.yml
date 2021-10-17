@@ -55,9 +55,6 @@ services:
       - ${CONFIG_DIR}/esphome:/config
     networks:
       - default
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
 
   # https://github.com/cdr/code-server
   code:
