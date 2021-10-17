@@ -3,18 +3,19 @@ version: "3.7"
 services:
   netdata:
     labels:
-      traefik.enable: "true"
+      traefik.enable: "false" # turned off to wait for rate limit reset (should be 10/20/21)
       traefik.docker.network: homelab_default
-      traefik.http.routers.netdata.tls.certresolver: prod
+      #traefik.http.routers.netdata.tls.certresolver: prod
       traefik.http.routers.netdata.rule: Host(`${NETDATA_HOST}`)
       traefik.http.routers.netdata.middlewares: hsts-header, traefik-forward-auth
 
   traefik-forward-auth:
     labels:
       traefik.enable: "true"
-      traefik.http.routers.traefik-forward-auth.tls.certresolver: staging
+      traefik.http.routers.traefik-forward-auth.tls.certresolver: prod
       traefik.http.routers.traefik-forward-auth.rule: Host(`${AUTH_HOST}`)
-      traefik.http.middlewares.traefik-forward-auth.forwardauth.address: https://traefik-forward-auth:4181
+      traefik.http.routers.traefik-forward-auth.middlewares:  traefik-forward-auth
+      traefik.http.middlewares.traefik-forward-auth.forwardauth.address: http://traefik-forward-auth:4181
       traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders: X-Forwarded-User
       traefik.http.services.traefik-forward-auth.loadbalancer.server.port: 4181
 
@@ -56,14 +57,13 @@ services:
       traefik.http.routers.personal-site.middlewares: hsts-header
       traefik.http.routers.personal-site-dashboard.tls.certresolver: prod
       traefik.http.routers.personal-site-dashboard.rule: "Host(`${PERSONAL_SITE_HOST}`) && PathPrefix(`${DASHBOARD_PATH}`)"
-      traefik.http.routers.personal-site-dashboard.middlewares: hsts-header, basicauth
+      traefik.http.routers.personal-site-dashboard.middlewares: hsts-header, traefik-forward-auth
       traefik.http.services.personal-site.loadbalancer.server.port: ${WWW_PORT}
       traefik.http.services.personal-site.loadbalancer.server.scheme: http
 
   adguard:
     labels:
       traefik.enable: "true"
-      traefik.docker.network: homelab_default
       traefik.http.routers.adguard.tls.certresolver: prod
       traefik.http.routers.adguard.rule: Host(`${ADGUARD_HOST}`)
       traefik.http.routers.adguard.middlewares: hsts-header
@@ -84,6 +84,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_DIR}/traefik:/etc/traefik:rw
+    dns:
+      - 8.8.8.8
+      - 4.4.4.4
     command:
       - "--log.level=INFO"
       - "--api=true"
