@@ -3,9 +3,9 @@ version: "3.7"
 services:
   netdata:
     labels:
-      traefik.enable: "false" # turned off to wait for rate limit reset (should be 10/20/21)
+      traefik.enable: "true"
       traefik.docker.network: homelab_default
-      #traefik.http.routers.netdata.tls.certresolver: prod
+      traefik.http.routers.netdata.tls.certresolver: prod
       traefik.http.routers.netdata.rule: Host(`${NETDATA_HOST}`)
       traefik.http.routers.netdata.middlewares: hsts-header, traefik-forward-auth
 
