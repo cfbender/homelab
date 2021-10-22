@@ -43,6 +43,9 @@ services:
     dns:
       - 1.1.1.1
       - 1.0.0.1
+    devices: 
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB1:/dev/ttyUSB1
 
   # https://github.com/esphome/esphome
   esphome:
