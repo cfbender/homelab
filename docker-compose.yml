@@ -6,7 +6,7 @@ networks:
 services:
   # https://hub.docker.com/r/netdata/netdata
   netdata:
-    image: netdata/netdata@sha256:41f92ccb279ceb750bcaae2958b4fc13a425913a3e54b3d59324ccef118e4507
+    image: netdata/netdata
     restart: unless-stopped
     hostname: ${NETDATA_HOST}
     environment:
@@ -30,7 +30,7 @@ services:
 
   # https://www.home-assistant.io/
   home:
-    image: lscr.io/linuxserver/homeassistant@sha256:cac8fb5fe794934d88dcbfd0dbcda1ebc657319b5a0a057b7d8df0fb19d5d202
+    image: lscr.io/linuxserver/homeassistant
     restart: unless-stopped
     network_mode: host
     environment:
@@ -49,7 +49,7 @@ services:
 
   # https://github.com/esphome/esphome
   esphome:
-    image: esphome/esphome@sha256:c29d71c7579cd988220ea551807b19d6354e6bfa3aa8bb37163671ce68e06ad0
+    image: esphome/esphome
     restart: unless-stopped
     environment:
       TZ: ${TZ}
@@ -61,7 +61,7 @@ services:
 
   # https://github.com/cdr/code-server
   code:
-    image: lscr.io/linuxserver/code-server@sha256:ccb72549eec0546024cf19764d1acda0566f42e558c8badc3975226d8e909e33
+    image: lscr.io/linuxserver/code-server
     restart: unless-stopped
     environment:
       TZ: ${TZ}
@@ -97,7 +97,7 @@ services:
 
   # https://registry.hub.docker.com/r/adguard/adguardhome
   adguard:
-    image: adguard/adguardhome@sha256:de7d791b814560663fe95f9812fca2d6dd9d6507e4b1b29926cc7b4a08a676ad
+    image: adguard/adguardhome
     restart: unless-stopped
     network_mode: host
     volumes:
@@ -114,7 +114,7 @@ services:
 
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
-    image: thomseddon/traefik-forward-auth@sha256:69a2c985d2c518b6f0e77161a98628a148a5d964e4e84fc52cc62e19bb4da634
+    image: thomseddon/traefik-forward-auth
     environment:
       - PROVIDERS_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - PROVIDERS_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -128,3 +128,11 @@ services:
     dns:
       - 1.1.1.1
       - 1.0.0.1
+  
+  watchtower:
+    image: containrrr/watchtower
+    environment:
+      WATCHTOWER_NOTIFICATIONS: "shoutrrr"
+      WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
