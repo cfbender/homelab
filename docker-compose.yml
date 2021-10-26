@@ -88,7 +88,7 @@ services:
     environment:
       PORT: ${WWW_PORT}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
-      HOSTNAME: ${PERSONAL_SITE_HOST}
+      HOSTNAME: ${COOKIE_DOMAIN}
     networks:
       - default
     dns:

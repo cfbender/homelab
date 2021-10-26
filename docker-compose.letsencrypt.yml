@@ -53,10 +53,10 @@ services:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
       traefik.http.routers.personal-site.tls.certresolver: prod
-      traefik.http.routers.personal-site.rule: Host(`${PERSONAL_SITE_HOST}`)
+      traefik.http.routers.personal-site.rule: "Host(`${PERSONAL_SITE_HOST}`) || Host(`${COOKIE_DOMAIN}`)"
       traefik.http.routers.personal-site.middlewares: hsts-header
       traefik.http.routers.personal-site-dashboard.tls.certresolver: prod
-      traefik.http.routers.personal-site-dashboard.rule: "Host(`${PERSONAL_SITE_HOST}`) && PathPrefix(`${DASHBOARD_PATH}`)"
+      traefik.http.routers.personal-site-dashboard.rule: "(Host(`${PERSONAL_SITE_HOST}`) || Host(`${COOKIE_DOMAIN}`)) && PathPrefix(`${DASHBOARD_PATH}`)"
       traefik.http.routers.personal-site-dashboard.middlewares: hsts-header, traefik-forward-auth
       traefik.http.services.personal-site.loadbalancer.server.port: ${WWW_PORT}
       traefik.http.services.personal-site.loadbalancer.server.scheme: http
@@ -76,6 +76,8 @@ services:
     restart: unless-stopped
     environment:
       TZ: "${TZ}"
+      CF_API_EMAIL: "${CF_API_EMAIL}"
+      CF_API_KEY: "${CF_API_KEY}"
     networks:
       - default
     ports:
@@ -96,11 +98,13 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesResolvers.prod.acme.tlschallenge=true"
+      - "--certificatesResolvers.prod.acme.dnschallenge=true"
+      - "--certificatesResolvers.prod.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.prod.acme.storage=/etc/traefik/acme.json"
       - "--certificatesresolvers.prod.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.prod.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
-      - "--certificatesResolvers.staging.acme.tlschallenge=true"
+      - "--certificatesResolvers.staging.acme.dnschallenge=true"
+      - "--certificatesResolvers.staging.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.staging.acme.storage=/etc/traefik/acme.json"
       - "--certificatesresolvers.staging.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.staging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
