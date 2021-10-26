@@ -23,3 +23,7 @@ services:
   adguard:
     ports:
       - ${ADGUARD_PORT}:${ADGUARD_PORT}
+
+  portainer:
+    ports:
+      - "9000:9000/tcp"

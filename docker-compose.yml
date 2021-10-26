@@ -136,3 +136,13 @@ services:
       WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  portainer:
+    image: portainer/portainer-ce
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DATA_DIR}/portainer:/data
+    networks:
+      - default
