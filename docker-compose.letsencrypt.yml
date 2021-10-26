@@ -117,6 +117,7 @@ services:
       - "--certificatesresolvers.staging.acme.storage=/etc/traefik/acme.json"
       - "--certificatesresolvers.staging.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.staging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--pilot.token=${PILOT_TOKEN}"
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
