@@ -94,6 +94,8 @@ services:
     dns:
       - 1.1.1.1
       - 1.0.0.1
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
 
   # https://registry.hub.docker.com/r/adguard/adguardhome
   adguard:
@@ -132,6 +134,7 @@ services:
   watchtower:
     image: containrrr/watchtower
     environment:
+      TZ: ${TZ}
       WATCHTOWER_NOTIFICATIONS: "shoutrrr"
       WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
     volumes:
