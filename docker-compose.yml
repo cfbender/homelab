@@ -44,7 +44,6 @@ services:
       - 1.1.1.1
       - 1.0.0.1
     devices: 
-      - /dev/ttyUSB0:/dev/ttyUSB0
       - /dev/ttyUSB1:/dev/ttyUSB1
 
   # https://github.com/esphome/esphome
@@ -147,5 +146,22 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_DIR}/portainer:/data
+    networks:
+      - default
+
+  zwave:
+    image: kpine/zwave-js-server
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/zwave:/cache
+    environment:
+      S2_ACCESS_CONTROL_KEY: ${S2_ACCESS_CONTROL_KEY}
+      S2_AUTHENTICATED_KEY: ${S2_AUTHENTICATED_KEY}
+      S2_UNAUTHENTICATED_KEY: ${S2_UNAUTHENTICATED_KEY}
+      S0_LEGACY_KEY: ${S0_LEGACY_KEY}
+    devices: 
+      - ${ZWAVE_SERIAL_PATH}:/dev/zwave
+    ports:
+      - "8484:3000"
     networks:
       - default
