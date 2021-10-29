@@ -67,6 +67,7 @@ services:
       PUID: ${PUID}
       PGID: ${PGID}
       SUDO_PASSWORD_HASH: ${CODE_SUDO_PASSWORD_HASH} 
+      PORT: ${CODE_PORT}
     volumes:
       - ${CONFIG_DIR}/code:/config
       - ${CODE_DIR}:/home/code
@@ -162,6 +163,20 @@ services:
     devices: 
       - ${ZWAVE_SERIAL_PATH}:/dev/zwave
     ports:
-      - "8484:3000"
+      - 8484:3000
     networks:
       - default
+
+  unifi:
+    image: lscr.io/linuxserver/unifi-controller
+    restart: unless-stopped
+    network_mode: host
+    environment: 
+      PUID: ${PUID}
+      PGID: ${PGID}
+    volumes:
+      - ${CONFIG_DIR}/unifi:/config
+    ports:
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080

@@ -45,7 +45,7 @@ services:
       traefik.http.routers.code.tls.certresolver: prod
       traefik.http.routers.code.rule: Host(`${CODE_HOST}`)
       traefik.http.routers.code.middlewares: hsts-header, traefik-forward-auth
-      traefik.http.services.code.loadbalancer.server.port: 8443
+      traefik.http.services.code.loadbalancer.server.port: ${CODE_PORT}
       traefik.http.services.code.loadbalancer.server.scheme: http
 
   personal-site:
@@ -79,6 +79,15 @@ services:
       traefik.http.routers.portainer.middlewares: hsts-header
       traefik.http.services.portainer.loadbalancer.server.port: 9000
       traefik.http.services.portainer.loadbalancer.server.scheme: http
+
+  unifi:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.unifi.tls.certresolver: prod
+      traefik.http.routers.unifi.rule: Host(`${UNIFI_HOST}`)
+      traefik.http.routers.unifi.middlewares: hsts-header
+      traefik.http.services.unifi.loadbalancer.server.port: 8443
+      traefik.http.services.unifi.loadbalancer.server.scheme: https
 
   # https://hub.docker.com/_/traefik/
   traefik:
@@ -118,6 +127,7 @@ services:
       - "--certificatesresolvers.staging.acme.storage=/etc/traefik/acme.json"
       - "--certificatesresolvers.staging.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.staging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--serversTransport.insecureSkipVerify=true"
       - "--pilot.token=${PILOT_TOKEN}"
     labels:
       traefik.enable: "true"
