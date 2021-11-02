@@ -40,9 +40,6 @@ services:
     volumes:
       - ${CONFIG_DIR}/home:/config
       - /etc/localtime:/etc/localtime:ro
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
     devices: 
       - /dev/ttyUSB1:/dev/ttyUSB1
 
@@ -110,9 +107,6 @@ services:
       - "3000:3000/tcp"
     expose:
       - 53
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
 
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
@@ -138,8 +132,12 @@ services:
       TZ: ${TZ}
       WATCHTOWER_NOTIFICATIONS: "shoutrrr"
       WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
+    command: --schedule "0 0 20 * * *"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   # https://github.com/portainer/portainer
   portainer:
@@ -151,6 +149,9 @@ services:
       - ${DATA_DIR}/portainer:/data
     networks:
       - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   # https://github.com/zwave-js/node-zwave-js
   zwave:
@@ -169,6 +170,9 @@ services:
       - 8484:3000
     networks:
       - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   # https://github.com/linuxserver/docker-unifi-controller
   unifi:
@@ -203,6 +207,9 @@ services:
       - bookstack_db
     networks:
       - default
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   bookstack_db:
     image: lscr.io/linuxserver/mariadb
