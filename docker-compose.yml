@@ -130,7 +130,8 @@ services:
     dns:
       - 1.1.1.1
       - 1.0.0.1
-  
+
+  # https://github.com/containrrr/watchtower/ 
   watchtower:
     image: containrrr/watchtower
     environment:
@@ -140,6 +141,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  # https://github.com/portainer/portainer
   portainer:
     image: portainer/portainer-ce
     restart: unless-stopped
@@ -150,6 +152,7 @@ services:
     networks:
       - default
 
+  # https://github.com/zwave-js/node-zwave-js
   zwave:
     image: kpine/zwave-js-server
     restart: unless-stopped
@@ -167,6 +170,7 @@ services:
     networks:
       - default
 
+  # https://github.com/linuxserver/docker-unifi-controller
   unifi:
     image: lscr.io/linuxserver/unifi-controller
     restart: unless-stopped
@@ -180,3 +184,39 @@ services:
       - 3478:3478/udp
       - 10001:10001/udp
       - 8080:8080
+
+  # https://github.com/BookStackApp/BookStack
+  bookstack:
+    image: lscr.io/linuxserver/bookstack
+    restart: unless-stopped
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      APP_URL: https://${BOOKSTACK_HOST}
+      DB_HOST: bookstack_db
+      DB_DATABASE: bookstackapp
+      DB_USERNAME: ${BOOKSTACK_DB_USER}
+      DB_PASSWORD: ${BOOKSTACK_DB_PASS}
+    volumes:
+      - ${DATA_DIR}/bookstack:/config
+    depends_on:
+      - bookstack_db
+    networks:
+      - default
+
+  bookstack_db:
+    image: lscr.io/linuxserver/mariadb
+    restart: unless-stopped
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      MYSQL_DATABASE: bookstackapp
+      MYSQL_USER: ${BOOKSTACK_DB_USER}
+      MYSQL_PASSWORD: ${BOOKSTACK_DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${BOOKSTACK_DB_ROOT_PASS}
+    volumes:
+      - ${DATA_DIR}/bookstack_db:/config
+    networks:
+      - default
+

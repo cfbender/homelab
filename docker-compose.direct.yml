@@ -27,3 +27,7 @@ services:
   portainer:
     ports:
       - "9000:9000/tcp"
+
+  unifi:
+    ports:
+      - "8443:8443"
