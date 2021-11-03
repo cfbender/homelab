@@ -228,3 +228,25 @@ services:
     networks:
       - default
 
+  # https://github.com/linuxserver/docker-wireguard
+  wireguard:
+    image: lscr.io/linuxserver/wireguard
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      SERVERURL: ${WIREGUARD_HOST}
+      SERVERPORT: 51820
+      PEERS: 5
+      PEERDNS: auto
+    ports:
+      - 51820:51820/udp
+    volumes:
+      - ${CONFIG_DIR}/wireguard:/config
+      - /lib/modules:/lib/modules
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
