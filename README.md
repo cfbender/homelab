@@ -2,6 +2,10 @@
 
 docker-based server using custom subdomains over https
 
+## Initial installation
+
+Clone this repo, or fork it first if you want to! Be sure to install the pre-commit hook following the instructions in that file. It will strip out the values from `.env` and generate a `env.sample` file with only the keys. It also will strip emails and the pilot token from `traefik/traefik.yml` and generate a `traefik/traefik.yml.sample`.
+
 ## Motivation
 
 - host each service as a subdomain of a personal domain with cloudflare/letsencrypt
