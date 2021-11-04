@@ -22,7 +22,7 @@ services:
 
   adguard:
     ports:
-      - ${ADGUARD_PORT}:${ADGUARD_PORT}
+      - "3333:3333/tcp"
 
   portainer:
     ports:
@@ -30,4 +30,9 @@ services:
 
   unifi:
     ports:
-      - "8443:8443"
+      - "8443:8443/tcp"
+
+  bookstack:
+    ports:
+      "80:80/tcp"
+
