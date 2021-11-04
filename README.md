@@ -2,8 +2,6 @@
 
 docker-based server using custom subdomains over https
 
-Started with [klutchell's mediaserver](https://github.com/klutchell/mediaserver)
-
 ## Motivation
 
 - host each service as a subdomain of a personal domain with cloudflare/letsencrypt
@@ -142,6 +140,6 @@ docker-compose exec traefik htpasswd /etc/traefik/.htpasswd <user2>
 
 ## Acknowledgments
 
-Kyle Harding <https://klutchell.dev>
+Started with setup from [klutchell's mediaserver](https://github.com/klutchell/mediaserver)
 
 [Buy them a beer](https://buymeacoffee.com/klutchell)
