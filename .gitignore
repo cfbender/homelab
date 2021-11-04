@@ -1,3 +1,6 @@
-*/
+data/
+!traefik
+traefik/*
+!traefik/traefik.yml.sample
 .env
 docker-compose.override.yml

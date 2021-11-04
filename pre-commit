@@ -6,3 +6,7 @@
 # update env.sample by stripping values from .env
 sed -r "/^[[:space:]]*#/!s|([^=]+=).*|\1|g" ".env" > "env.sample"
 git add "env.sample"
+
+# strip acme email and pilot token from traefik config
+sed -re "s/(\s*email:).*$/\1 <ACME_EMAIL>/gi" "traefik/traefik.yml" | sed -re "s/(\s*token:).*$/\1 <PILOT_TOKEN>/gi" > "traefik/traefik.yml.sample"
+git add "traefik/traefik.yml.sample"
