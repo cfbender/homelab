@@ -2,53 +2,93 @@
 
 docker-based server using custom subdomains over https
 
-Mostly copied from [klutchell's mediaserver](https://github.com/klutchell/mediaserver)
+Started with [klutchell's mediaserver](https://github.com/klutchell/mediaserver)
 
 ## Motivation
 
-- host each service as a subdomain of a personal domain with letsencrypt
+- host each service as a subdomain of a personal domain with cloudflare/letsencrypt
 - run public maintained images with no modifications
 - require minimal configuration and setup
 
-## Features
+## Containers
 
 - [Netdata](https://www.netdata.cloud/) - Troubleshoot slowdowns and anomalies in your infrastructure with thousands of metrics, interactive visualizations, and insightful health alarms.
-- [Traefik](https://traefik.io/) is a modern HTTP reverse proxy and load balancer that makes deploying microservices easy.
+- [Traefik](https://traefik.io/) - modern HTTP reverse proxy and load balancer that makes deploying microservices easy.
 - [Home Assistant](https://www.home-assistant.io/) - Open source home automation that puts local control and privacy first.
-- [ESPHome](https://esphome.io/) is a system to control your ESP8266/ESP32 by simple yet powerful configuration files and control them remotely through Home Automation systems.
+- [ESPHome](https://esphome.io/) - system to control your ESP8266/ESP32 by simple yet powerful configuration files and control them remotely through Home Automation systems.
 - [code-server](https://github.com/cdr/code-server) - Run VS Code on any machine anywhere and access it in the browser.
-- [personal-site](https://github.com/cfbender/personal-site) - my personal site, built with Phoenix LiveView
-- [AdGuard Home](https://adguard.com/en/adguard-home/overview.html) is a network-wide software for blocking ads & tracking. 
+- [personal-site](https://github.com/cfbender/personal-site) - my personal site, built with Phoenix LiveView.
+- [AdGuard Home](https://adguard.com/en/adguard-home/overview.html) - network-wide software for blocking ads & tracking.
+- [Watchtower](https://containrrr.dev/watchtower/) - container-based solution for automating Docker container base image updates.
+- [Portainer CE](https://www.portainer.io/) - lightweight ‘universal’ management GUI that can be used to easily manage Docker, Swarm, Kubernetes and ACI environments.
+- [Z-waveJS](https://github.com/zwave-js/node-zwave-js) - Z-Wave device driver written entirely in JavaScript/TypeScript \*
+- [Unifi controller](https://docs.linuxserver.io/images/docker-unifi-controller) - powerful, enterprise wireless software engine ideal for high-density client deployments requiring low latency and high uptime performance.
+- [Bookstack](https://www.bookstackapp.com/) - simple, self-hosted, easy-to-use platform for organising and storing information.
+- [Wireguard](https://www.wireguard.com/) - extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography.
+
+\*not exposed even in external configuration
 
 ## Requirements
 
 - dedicated server or PC
 - [docker](https://docs.docker.com/install/linux/docker-ce/debian/) and [docker-compose](https://docs.docker.com/compose/install/#install-compose)
-- (optional) personal domain with configurable sub-domains (eg. plex.example.com)
+- (optional) personal domain with configurable sub-domains (eg. netdata.example.com)
 
-## Direct Configuration
+## Internal Configuration (local network only)
 
 Copy `env.sample` to `.env` and populate all fields in the `COMMON` section.
 
-Create a link in order to append `docker-compose.direct.yml` to future docker-compose commands.
+Create a link in order to append `docker-compose.internal.yml` to future docker-compose commands.
 
 ```bash
-ln -sf docker-compose.direct.yml docker-compose.override.yml
+ln -sf docker-compose.internal.yml docker-compose.override.yml
 ```
 
 Review the merged configs by running `docker-compose config`.
 
-## Letsencrypt Configuration
+## External Configuration (exposed to internet)
 
-Copy `env.sample` to `.env` and populate all fields in the `COMMON` and `LETSENCRYPT` sections.
+Copy `env.sample` to `.env` and populate all fields in the `COMMON` and `EXTERNAL` sections.
 
-Create a link in order to append `docker-compose.letsencrypt.yml` to future docker-compose commands.
+Create a link in order to append `docker-compose.external.yml` to future docker-compose commands.
 
 ```bash
-ln -sf docker-compose.letsencrypt.yml docker-compose.override.yml
+ln -sf docker-compose.external.yml docker-compose.override.yml
 ```
 
 Review the merged configs by running `docker-compose config`.
+
+Copy `traefik/traefik.yml.sample` to `traefik/traefik.yml` and fill in the `ACME_EMAIL` and `PILOT_TOKEN` variables (the pilot token is an optional property for Traefik Pilot, feel free to remove the section all-together).
+
+Be sure to port forward `:443` on your router to get access externally.
+
+It is recommended to use the `staging` cert resolver initially to avoid any potential rate limits from Let's Encrypt for any misconfigured services.
+
+## Other configuration / Notes
+
+### Wireguard
+
+You will need to forward port 51820/udp, and be sure that it is not proxied through Cloudflare, as the CF proxy only allows HTTP traffic.
+
+On initial startup, the container should generate 5 peer QR codes. You can view them with:
+
+```bash
+docker-compose logs -tf wireguard
+```
+
+### AdGuard
+
+On startup for the intial configuration the web interface will bind to port `3000`. If you have local access to the server, you can access it there (ie. `10.0.0.10:3000`), and then be sure that it does not bind to port `80`, but instead `3333` (defined in external labels for loadbalancer).
+
+If you do not have direct network access to the server, you can launch the first time with the loadbalancer port to `:3000`, configure it to bind to `3333`, then restart with the original port in the label configuration.
+
+### DNS
+
+I have manually overriden the DNS of many of the containers, to get around any networking weirdness with it being on the same machine, as well as any potential interference from AdGuard. This is probably not needed and you are free to experiment.
+
+### Home assistant
+
+Using the [linuxserver](https://linuxserver.io) container fixes many issues you may run into with Home Assistant docker, however the networking can still be an issue. The network mode needs to be `host`, so that it can discover and manage devices on the network, and then this the interface is exposed to traefik through `extra_hosts`. I also have the DNS pointing to AdGuard so that it can resolve local hostnames.
 
 ## Deployment
 
@@ -59,34 +99,29 @@ docker-compose pull
 docker-compose up -d
 ```
 
-## Authorization
+## Cloudflare
 
-There are currently two methods of authentication enabled, and I recommend using them
-both if the Letsencrypt configuration is in use. If it's not exposed to the Internet you can
-remove one or both of these middlewares from `docker-compose.letsencrypt.yml`.
+This configuration is set up for a domain proxied through Cloudflare. You can remove this by removing the `CF_API_KEY` and `CF_API_EMAIL` environment cariables, as well as the `entrypoints.websecure.forwardedHeaders.trustedIPs` config in `traefik/traefik.yml`.
+
+## Middlewares
 
 ### ipallowlist
-
-This is our first layer of security, and probably the most important.
 
 If you are using mediaserver locally and are not exposing any ports to the Internet, you can skip
 this section or set `IPALLOWLIST=0.0.0.0/0,::/0` in your `.env` file.
 
-To avoid unauthorized users from even seeing our login pages, we should set the `IPALLOWLIST` to
-only IP ranges that we want to explictly allow access.
+Set the `IPALLOWLIST` to only IP ranges that we want to explictly allow access.
 
-Access from any other IP will result in "403 Forbidden" giving you some peice of mind!
-
-This functionality can be enabled/disabled per service in `docker-compose.letsencrypt.yml`
+This functionality can be enabled/disabled per service in `docker-compose.external.yml`
 with the `ipallowlist` middleware.
 
 ### traefik-forward-auth
 
-Uses [traefik-forward-auth](https://github.com/thomseddon/traefik-forward-auth) to handle OAuth through google. Just follow the setup instructions there, and fill in the relevant fields in env
+Uses [traefik-forward-auth](https://github.com/thomseddon/traefik-forward-auth) to handle OAuth through google. Just follow the setup instructions there, and fill in the relevant fields in env.
 
 ### basicauth
 
-This functionality can be enabled/disabled per service in `docker-compose.letsencrypt.yml`
+This functionality can be enabled/disabled per service in `docker-compose.external.yml`
 with the `basicauth` middleware.
 
 Users can be added to basic auth in 2 ways. If both methods are used they are merged and the
@@ -105,26 +140,8 @@ docker-compose exec traefik htpasswd -c /etc/traefik/.htpasswd <user1>
 docker-compose exec traefik htpasswd /etc/traefik/.htpasswd <user2>
 ```
 
-By default only Duplicati and Netdata have basic http auth enabled.
-
-For the remaining services I suggest enabling the built-in authentication via the app.
-This avoids the need to add manual exceptions for API access where required and simplifies our proxy rules.
-
-## Original Author
+## Acknowledgments
 
 Kyle Harding <https://klutchell.dev>
 
 [Buy them a beer](https://buymeacoffee.com/klutchell)
-
-## Acknowledgments
-
-I didn't create any of these docker images myself, so credit goes to the
-maintainers, and the original software creators.
-
-- <https://hub.docker.com/r/netdata/netdata/>
-- <https://hub.docker.com/r/thomseddon/traefik-forward-auth>
-- <https://hub.docker.com/_/traefik/>
-- <https://hub.docker.com/r/linuxserver/homeassistant>
-- <https://hub.docker.com/r/esphome/esphome>
-- <https://hub.docker.com/r/linuxserver/code-server>
-- <https://hub.docker.com/r/adguard/adguardhome>
