@@ -41,7 +41,7 @@ services:
       - ${CONFIG_DIR}/home:/config
       - /etc/localtime:/etc/localtime:ro
     devices: 
-      - ${ZIGBEE_SERIAL_PATH}:/dev/ttyUSB1
+      - /dev/ttyUSB1:/dev/ttyUSB1
 
   # https://github.com/esphome/esphome
   esphome:
