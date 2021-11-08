@@ -250,3 +250,16 @@ services:
       - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
+
+  mosquitto:
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
+      - ${CONFIG_DIR}/mosquitto:/mosquitto/config
+      - ${DATA_DIR}/mosquitto:/mosquitto/data
+      - ${DATA_DIR}/mosquitto/log:/mosquitto/log
+      - /etc/localtime:/etc/localtime:ro

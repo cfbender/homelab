@@ -98,6 +98,19 @@ services:
       traefik.http.services.bookstack.loadbalancer.server.port: 80
       traefik.http.services.bookstack.loadbalancer.server.scheme: http
 
+  mosquitto:
+    labels:
+      traefik.enable: "true"
+      traefik.tcp.routers.mosquitto.tls.certresolver: prod
+      traefik.tcp.routers.mosquitto.entrypoints: mqtt
+      traefik.tcp.routers.mosquitto.rule: HostSNI(`${MOSQUITTO_HOST}`)
+      traefik.tcp.services.mosquitto.loadbalancer.server.port: 1883
+      traefik.http.routers.mosquitto-socket.tls.certresolver: prod
+      traefik.http.routers.mosquitto-socket.entrypoints: websecure
+      traefik.http.routers.mosquitto-socket.rule: Host(`${MOSQUITTO_HOST}`)
+      traefik.http.services.mosquitto-socket.loadbalancer.server.port: 9001
+
+
   # https://hub.docker.com/_/traefik/
   traefik:
     image: traefik:latest
@@ -111,8 +124,10 @@ services:
     ports:
       - 80:80/tcp
       - 443:443/tcp
+      - 8883:8883/tcp
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/log:/var/log
       - ./traefik:/etc/traefik:rw
     dns:
       - 1.1.1.1

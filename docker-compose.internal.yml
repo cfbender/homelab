@@ -35,4 +35,3 @@ services:
   bookstack:
     ports:
       "80:80/tcp"
-
