@@ -255,9 +255,13 @@ services:
     image: eclipse-mosquitto
     restart: unless-stopped
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
       TZ: ${TZ}
+    ports:
+      - 1883:1883/tcp
+      - 9001:9001/tcp
+    expose:
+      - 1883
+      - 9001
     volumes:
       - ${CONFIG_DIR}/mosquitto:/mosquitto/config
       - ${DATA_DIR}/mosquitto:/mosquitto/data
