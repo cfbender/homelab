@@ -263,3 +263,18 @@ services:
       - ${DATA_DIR}/mosquitto:/mosquitto/data
       - ${DATA_DIR}/mosquitto/log:/mosquitto/log
       - /etc/localtime:/etc/localtime:ro
+  
+  fail2ban:
+    image: crazymax/fail2ban:latest
+    network_mode: "host"
+    environment:
+      TZ: ${TZ}
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./traefik/log:/var/log:ro
+      - ${CONFIG_DIR}/fail2ban/traefik.conf:/data/traefik.conf
+      - ${CONFIG_DIR}/fail2ban/filter.d:/data/filter.d
+      - ${DATA_DIR}/fail2ban:/data
+
