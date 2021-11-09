@@ -40,6 +40,7 @@ services:
     volumes:
       - ${CONFIG_DIR}/home:/config
       - /etc/localtime:/etc/localtime:ro
+      - ./fail2ban:/fail2ban
     devices: 
       - /dev/ttyUSB1:/dev/ttyUSB1
 
@@ -273,6 +274,7 @@ services:
     volumes:
       - ./fail2ban:/data
       - ./traefik/log/access.log:/var/log/access.log:ro
+      - ${CONFIG_DIR}/home/home-assistant.log:/var/log/home-assistant.log:ro
       - /var/log/auth.log:/var/log/auth.log:ro
 
   wyze-bridge:

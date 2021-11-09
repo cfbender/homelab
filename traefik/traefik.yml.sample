@@ -24,6 +24,7 @@ entrypoints:
     address: ":443"
     forwardedHeaders:
       trustedIPs:
+        - 127.17.0.1/32
         - 103.21.244.0/22
         - 103.22.200.0/22
         - 103.31.4.0/22
