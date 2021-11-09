@@ -23,13 +23,13 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [AdGuard Home](https://adguard.com/en/adguard-home/overview.html) - network-wide software for blocking ads & tracking.
 - [Watchtower](https://containrrr.dev/watchtower/) - container-based solution for automating Docker container base image updates.
 - [Portainer CE](https://www.portainer.io/) - lightweight ‘universal’ management GUI that can be used to easily manage Docker, Swarm, Kubernetes and ACI environments.
-- [Z-waveJS](https://github.com/zwave-js/node-zwave-js) - Z-Wave device driver written entirely in JavaScript/TypeScript \*
+- [Z-waveJS2MQTT](https://github.com/zwave-js/zwavejs2mqtt) - Fully configurable Zwave to MQTT Gateway and Control Panel.
 - [Unifi controller](https://docs.linuxserver.io/images/docker-unifi-controller) - powerful, enterprise wireless software engine ideal for high-density client deployments requiring low latency and high uptime performance.
 - [Bookstack](https://www.bookstackapp.com/) - simple, self-hosted, easy-to-use platform for organising and storing information.
 - [Wireguard](https://www.wireguard.com/) - extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography.
 - [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) - scans log files and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc.
-- [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. *
-- [docker-wyze-bridge](https://github.com/mrlt8/docker-wyze-bridge) - expose a local RTMP, RTSP, and HLS stream for ALL your Wyze cameras including the outdoor and doorbell cams. *
+- [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. \*
+- [docker-wyze-bridge](https://github.com/mrlt8/docker-wyze-bridge) - expose a local RTMP, RTSP, and HLS stream for ALL your Wyze cameras including the outdoor and doorbell cams. \*
 \*not exposed even in external configuration
 
 ## Requirements
@@ -93,6 +93,38 @@ I have manually overriden the DNS of many of the containers, to get around any n
 ### Home assistant
 
 Using the [linuxserver](https://linuxserver.io) container fixes many issues you may run into with Home Assistant docker, however the networking can still be an issue. The network mode needs to be `host`, so that it can discover and manage devices on the network, and then this the interface is exposed to traefik through `extra_hosts`. I also have the DNS pointing to AdGuard so that it can resolve local hostnames.
+
+Set the following into `${CONFIG_DIR}/home/configuration.yaml`:
+
+```yaml
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - 172.16.0.0/12
+    # cloudflare IPs for skipping in X-Forwarded-For header
+    - 103.21.244.0/22
+    - 103.22.200.0/22
+    - 103.31.4.0/22
+    - 104.16.0.0/13
+    - 104.24.0.0/14
+    - 108.162.192.0/18
+    - 131.0.72.0/22
+    - 141.101.64.0/18
+    - 162.158.0.0/15
+    - 172.64.0.0/13
+    - 173.245.48.0/20
+    - 188.114.96.0/20
+    - 190.93.240.0/20
+    - 197.234.240.0/22
+    - 198.41.128.0/17
+```
+
+### Fail2Ban
+
+This is set up to ban the real client IP in cloudflare, as well as the local iptables just for funsies (though my firewall does that job already). It is set up for all traefik applications by reading the access log, but home assistant for some reason decided to return a `200` even on a failed login. So there is another jail that reads the home assistant logs as well.
+
+Copy `fail2ban/cloudflare.conf.example` to `fail2ban/cloudflare.conf` and fill in the `cftoken` and `cfuser` fields with the api key and email you use for cloudflare login.
 
 ## Deployment
 
