@@ -30,7 +30,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) - scans log files and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc.
 - [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. \*
 - [docker-wyze-bridge](https://github.com/mrlt8/docker-wyze-bridge) - expose a local RTMP, RTSP, and HLS stream for ALL your Wyze cameras including the outdoor and doorbell cams. \*
-\*not exposed even in external configuration
+  \*not exposed even in external configuration
 
 ## Requirements
 
@@ -154,6 +154,8 @@ with the `ipallowlist` middleware.
 ### traefik-forward-auth
 
 Uses [traefik-forward-auth](https://github.com/thomseddon/traefik-forward-auth) to handle OAuth through google. Just follow the setup instructions there, and fill in the relevant fields in env.
+
+This stack uses the TFA host mode, which is hosted at `AUTH_HOST`. Thus, the redirect URI you enter into google will be `https://<AUTH_HOST>/_oauth`. This way you don't need to make an individual entry for every subdomain.
 
 ### basicauth
 
