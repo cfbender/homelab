@@ -80,6 +80,15 @@ services:
       traefik.http.services.portainer.loadbalancer.server.port: 9000
       traefik.http.services.portainer.loadbalancer.server.scheme: http
 
+  zwave:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.zwave.tls.certresolver: prod
+      traefik.http.routers.zwave.rule: Host(`${ZWAVE_HOST}`)
+      traefik.http.routers.zwave.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.zwave.loadbalancer.server.port: 8091
+      traefik.http.services.zwave.loadbalancer.server.scheme: http
+
   unifi:
     labels:
       traefik.enable: "true"

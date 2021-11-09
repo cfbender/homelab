@@ -28,6 +28,11 @@ services:
     ports:
       - "9000:9000/tcp"
 
+  zwave:
+    ports:
+      - "8484:3000/tcp"
+      - "8091:8091/tcp"
+
   unifi:
     ports:
       - "8443:8443/tcp"

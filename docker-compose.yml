@@ -153,23 +153,17 @@ services:
       - 1.1.1.1
       - 1.0.0.1
 
-  # https://github.com/zwave-js/node-zwave-js
+  # https://github.com/zwave-js/zwavejs2mqtt
   zwave:
-    image: kpine/zwave-js-server
+    image: zwavejs/zwavejs2mqtt
     restart: unless-stopped
+    tty: true
     volumes:
-      - ${DATA_DIR}/zwave:/cache
-    environment:
-      S2_ACCESS_CONTROL_KEY: ${S2_ACCESS_CONTROL_KEY}
-      S2_AUTHENTICATED_KEY: ${S2_AUTHENTICATED_KEY}
-      S2_UNAUTHENTICATED_KEY: ${S2_UNAUTHENTICATED_KEY}
-      S0_LEGACY_KEY: ${S0_LEGACY_KEY}
+      - ${DATA_DIR}/zwavejs2mqtt:/usr/src/app/store
     devices: 
       - ${ZWAVE_SERIAL_PATH}:/dev/zwave
     ports:
       - 8484:3000
-    networks:
-      - default
     dns:
       - 1.1.1.1
       - 1.0.0.1
@@ -270,7 +264,7 @@ services:
   
   fail2ban:
     image: crazymax/fail2ban:latest
-    network_mode: "host"
+    network_mode: host
     environment:
       TZ: ${TZ}
     cap_add:
