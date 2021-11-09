@@ -85,7 +85,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.zwave.tls.certresolver: prod
       traefik.http.routers.zwave.rule: Host(`${ZWAVE_HOST}`)
-      traefik.http.routers.zwave.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.zwave.middlewares: hsts-header
       traefik.http.services.zwave.loadbalancer.server.port: 8091
       traefik.http.services.zwave.loadbalancer.server.scheme: http
 
