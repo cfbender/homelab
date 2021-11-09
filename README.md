@@ -27,7 +27,9 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Unifi controller](https://docs.linuxserver.io/images/docker-unifi-controller) - powerful, enterprise wireless software engine ideal for high-density client deployments requiring low latency and high uptime performance.
 - [Bookstack](https://www.bookstackapp.com/) - simple, self-hosted, easy-to-use platform for organising and storing information.
 - [Wireguard](https://www.wireguard.com/) - extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography.
-
+- [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) - scans log files and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc.
+- [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. *
+- [docker-wyze-bridge](https://github.com/mrlt8/docker-wyze-bridge) - expose a local RTMP, RTSP, and HLS stream for ALL your Wyze cameras including the outdoor and doorbell cams. *
 \*not exposed even in external configuration
 
 ## Requirements
