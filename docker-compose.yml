@@ -282,3 +282,20 @@ services:
       - ${CONFIG_DIR}/fail2ban/filter.d:/data/filter.d
       - ${DATA_DIR}/fail2ban:/data
 
+  wyze-bridge:
+    image: mrlt8/wyze-bridge:latest
+    environment:
+      WYZE_EMAIL: ${WYZE_EMAIL}
+      WYZE_PASSWORD: ${WYZE_PASSWORD}
+      MQTT_HOST: ${MOSQUITTO_HOST}
+      MQTT_AUTH: ${MQTT_AUTH}
+      MQTT_DTOPIC: homeassistant
+      RTSP_LOGLEVEL: debug
+      DEBUG_LEVEL: debug
+    volumes:
+      - ${DATA_DIR}/wyze:/tokens
+    ports:
+      - 8554:8554
+      - 8888:8888
+
+
