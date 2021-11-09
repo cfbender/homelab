@@ -271,10 +271,9 @@ services:
       - NET_ADMIN
       - NET_RAW
     volumes:
-      - ./traefik/log:/var/log:ro
-      - ${CONFIG_DIR}/fail2ban/traefik.conf:/data/traefik.conf
-      - ${CONFIG_DIR}/fail2ban/filter.d:/data/filter.d
-      - ${DATA_DIR}/fail2ban:/data
+      - ./fail2ban:/data
+      - ./traefik/log/access.log:/var/log/access.log:ro
+      - /var/log/auth.log:/var/log/auth.log:ro
 
   wyze-bridge:
     image: mrlt8/wyze-bridge:latest

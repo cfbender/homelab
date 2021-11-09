@@ -2,5 +2,6 @@ data/
 !traefik
 traefik/*
 !traefik/traefik.yml.sample
+fail2ban/db
 .env
 docker-compose.override.yml
