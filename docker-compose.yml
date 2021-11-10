@@ -285,8 +285,6 @@ services:
       MQTT_HOST: ${MOSQUITTO_HOST}
       MQTT_AUTH: ${MQTT_AUTH}
       MQTT_DTOPIC: homeassistant
-      RTSP_LOGLEVEL: debug
-      DEBUG_LEVEL: debug
     volumes:
       - ${DATA_DIR}/wyze:/tokens
     ports:
