@@ -4,5 +4,6 @@ traefik/*
 !traefik/traefik.yml.sample
 fail2ban/db
 fail2ban/action.d/cloudflare.conf
+fail2ban/jail.d/jail.local
 .env
 docker-compose.override.yml

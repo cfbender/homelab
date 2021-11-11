@@ -1,3 +1,0 @@
-[DEFAULT] 
-ignoreip = 172.16.0.0/12 136.60.237.170
-action = cloudflare

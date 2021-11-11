@@ -2,11 +2,17 @@ version: "3.7"
 
 networks:
   default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.69.0/24
+
 
 services:
   # https://hub.docker.com/r/netdata/netdata
   netdata:
     image: netdata/netdata
+    container_name: netdata
     restart: unless-stopped
     hostname: ${NETDATA_HOST}
     environment:
@@ -24,13 +30,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - default
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    dns: 172.20.69.53
 
   # https://www.home-assistant.io/
   home:
     image: lscr.io/linuxserver/homeassistant
+    container_name: home
     restart: unless-stopped
     network_mode: host
     environment:
@@ -43,10 +48,14 @@ services:
       - ./fail2ban:/fail2ban
     devices: 
       - /dev/ttyUSB1:/dev/ttyUSB1
+    ports:
+      - 8123:8123
+    dns: 127.0.0.1
 
   # https://github.com/esphome/esphome
   esphome:
     image: esphome/esphome
+    container_name: esphome
     restart: unless-stopped
     environment:
       TZ: ${TZ}
@@ -55,10 +64,12 @@ services:
       - ${CONFIG_DIR}/esphome:/config
     networks:
       - default
+    dns: 172.20.69.53
 
   # https://github.com/cdr/code-server
   code:
     image: lscr.io/linuxserver/code-server
+    container_name: code
     restart: unless-stopped
     environment:
       TZ: ${TZ}
@@ -71,9 +82,7 @@ services:
       - ${CODE_DIR}:/home/code
     networks:
       - default
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    dns: 172.20.69.53
 
   # https://github.com/cfbender/personal-site
   personal-site:
@@ -82,6 +91,7 @@ services:
       dockerfile: Dockerfile
       args:
         - SHOW_DASHBOARD=true
+    container_name: personal-site
     restart: unless-stopped
     environment:
       PORT: ${WWW_PORT}
@@ -89,29 +99,30 @@ services:
       HOSTNAME: ${COOKIE_DOMAIN}
     networks:
       - default
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    dns: 172.20.69.53
     labels:
       com.centurylinklabs.watchtower.enable: "false"
 
   # https://registry.hub.docker.com/r/adguard/adguardhome
   adguard:
     image: adguard/adguardhome
+    container_name: adguard
     restart: unless-stopped
-    network_mode: host
     volumes:
       - ${DATA_DIR}/adguard:/opt/adguardhome/work
       - ${CONFIG_DIR}/adguard:/opt/adguardhome/conf
     ports:
-      - "53:53/tcp"
-      - "3000:3000/tcp"
-    expose:
-      - 53
+      - 53:53/tcp
+      - 53:53/udp
+      - 3333:3000/tcp
+    networks:
+      default:
+        ipv4_address: 172.20.69.53
 
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth:2
+    container_name: traefik-forward-auth
     environment:
       - PROVIDERS_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - PROVIDERS_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -122,13 +133,12 @@ services:
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
     networks:
       - default
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    dns: 172.20.69.53
 
   # https://github.com/containrrr/watchtower/ 
   watchtower:
     image: containrrr/watchtower
+    container_name: watchtower
     environment:
       TZ: ${TZ}
       WATCHTOWER_NOTIFICATIONS: "shoutrrr"
@@ -136,13 +146,14 @@ services:
     command: --schedule "0 0 20 * * *" # runs daily at 8 PM
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    networks:
+      - default
+    dns: 172.20.69.53
 
   # https://github.com/portainer/portainer
   portainer:
     image: portainer/portainer-ce
+    container_name: portainer
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -150,13 +161,12 @@ services:
       - ${DATA_DIR}/portainer:/data
     networks:
       - default
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    dns: 172.20.69.53
 
   # https://github.com/zwave-js/zwavejs2mqtt
   zwave:
     image: zwavejs/zwavejs2mqtt
+    container_name: zwave
     restart: unless-stopped
     tty: true
     volumes:
@@ -165,29 +175,36 @@ services:
       - ${ZWAVE_SERIAL_PATH}:/dev/zwave
     ports:
       - 8484:3000
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    expose:
+      - 8484
+    networks:
+      - default
+    dns: 172.20.69.53
 
   # https://github.com/linuxserver/docker-unifi-controller
   unifi:
     image: lscr.io/linuxserver/unifi-controller
+    container_name: unifi
     restart: unless-stopped
-    network_mode: host
     environment: 
       PUID: ${PUID}
       PGID: ${PGID}
     volumes:
       - ${CONFIG_DIR}/unifi:/config
+    networks:
+      - default
     ports:
       - 3478:3478/udp
       - 10001:10001/udp
       - 8080:8080
+      - 8443:8443
       - 6789:6789 # optional
+    dns: 172.20.69.53
 
   # https://github.com/BookStackApp/BookStack
   bookstack:
     image: lscr.io/linuxserver/bookstack
+    container_name: bookstack
     restart: unless-stopped
     environment:
       PUID: ${PUID}
@@ -203,12 +220,11 @@ services:
       - bookstack_db
     networks:
       - default
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    dns: 172.20.69.53
 
   bookstack_db:
     image: lscr.io/linuxserver/mariadb
+    container_name: bookstack_db
     restart: unless-stopped
     environment:
       PUID: ${PUID}
@@ -222,10 +238,12 @@ services:
       - ${DATA_DIR}/bookstack_db:/config
     networks:
       - default
+    dns: 172.20.69.53
 
   # https://github.com/linuxserver/docker-wireguard
   wireguard:
     image: lscr.io/linuxserver/wireguard
+    container_name: wireguard
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
@@ -245,9 +263,12 @@ services:
       - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - default
 
   mosquitto:
     image: eclipse-mosquitto
+    container_name: mosquitto
     restart: unless-stopped
     environment:
       TZ: ${TZ}
@@ -262,9 +283,13 @@ services:
       - ${DATA_DIR}/mosquitto:/mosquitto/data
       - ${DATA_DIR}/mosquitto/log:/mosquitto/log
       - /etc/localtime:/etc/localtime:ro
+    networks:
+      - default
+    dns: 172.20.69.53
   
   fail2ban:
     image: crazymax/fail2ban:latest
+    container_name: fail2ban
     network_mode: host
     environment:
       TZ: ${TZ}
@@ -276,19 +301,6 @@ services:
       - ./traefik/log/access.log:/var/log/access.log:ro
       - ${CONFIG_DIR}/home/home-assistant.log:/var/log/home-assistant.log:ro
       - /var/log/auth.log:/var/log/auth.log:ro
-
-  wyze-bridge:
-    image: mrlt8/wyze-bridge:latest
-    environment:
-      WYZE_EMAIL: ${WYZE_EMAIL}
-      WYZE_PASSWORD: ${WYZE_PASSWORD}
-      MQTT_HOST: ${MOSQUITTO_HOST}
-      MQTT_AUTH: ${MQTT_AUTH}
-      MQTT_DTOPIC: homeassistant
-    volumes:
-      - ${DATA_DIR}/wyze:/tokens
-    ports:
-      - 8554:8554
-      - 8888:8888
-
-
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1

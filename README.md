@@ -87,9 +87,11 @@ On startup for the intial configuration the web interface will bind to port `300
 
 If you do not have direct network access to the server, you can launch the first time with the loadbalancer port to `:3000`, configure it to bind to `3333`, then restart with the original port in the label configuration.
 
-### DNS
+### DNS/Networks
 
-I have manually overriden the DNS of many of the containers, to get around any networking weirdness with it being on the same machine, as well as any potential interference from AdGuard. This is probably not needed and you are free to experiment.
+I have set up only the single default network, and assigned it a subnet so that I can assign an IP to AdGuard for containers to reference as DNS. This allows more granular insight into container network activity, as they will no longer be agregated at the host level.
+
+In order to see container names in AdGuard, set `[/69.20.172.in-addr.arpa/]127.0.0.11` in the "Private DNS servers" field in AdGuard. This tells AdGuard to send PTR requests in the docker network to the internal docker DNS resolver. The main downside here is that any containers that run in "host" mode (in this case, just Home Assistant) will show up in AdGuard as the subnet gateway address for the internal network.
 
 ### Home assistant
 
