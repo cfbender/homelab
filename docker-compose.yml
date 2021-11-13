@@ -50,7 +50,7 @@ services:
       - /dev/ttyUSB1:/dev/ttyUSB1
     ports:
       - 8123:8123
-    dns: 127.0.0.1
+    dns: ${SERVER_IP}
 
   # https://github.com/esphome/esphome
   esphome:
@@ -59,12 +59,11 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
-      ESPHOME_DASHBOARD_USE_PING: "true"
     volumes:
       - ${CONFIG_DIR}/esphome:/config
     networks:
       - default
-    dns: 172.20.69.53
+    dns: ${GATEWAY_IP}
 
   # https://github.com/cdr/code-server
   code:
