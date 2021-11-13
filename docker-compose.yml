@@ -118,6 +118,22 @@ services:
       default:
         ipv4_address: 172.20.69.53
 
+  # https://github.com/bakito/adguardhome-sync/
+  adguard-sync:
+    image: lscr.io/linuxserver/adguardhome-sync
+    restart: unless-stopped
+    container_name: adguard-sync
+    environment:
+      PUID: ${PUID}
+      PGID: ${PUID}
+      TZ: ${TZ}
+      CONFIGFILE: /config/adguardhome-sync.yaml
+    volumes:
+      - ${CONFIG_DIR}/adguard:/config
+    ports:
+      - 8090:8080
+    dns: 172.20.69.53
+
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth:2
