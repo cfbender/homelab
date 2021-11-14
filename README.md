@@ -29,7 +29,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Wireguard](https://www.wireguard.com/) - extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography.
 - [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) - scans log files and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. \*
 - [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. \*
-- [docker-wyze-bridge](https://github.com/mrlt8/docker-wyze-bridge) - expose a local RTMP, RTSP, and HLS stream for ALL your Wyze cameras including the outdoor and doorbell cams. \*
+- [adguardhome-sync](https://github.com/bakito/adguardhome-sync)- Synchronize AdGuardHome config to a replica instance. \*
 
 \*not exposed even in external configuration
 
@@ -86,6 +86,8 @@ docker-compose logs -tf wireguard
 On startup for the intial configuration the web interface will bind to port `3000`. If you have local access to the server, you can access it there (ie. `10.0.0.10:3000`), and then be sure that it does not bind to port `80`, but instead `3333` (defined in external labels for loadbalancer).
 
 If you do not have direct network access to the server, you can launch the first time with the loadbalancer port to `:3000`, configure it to bind to `3333`, then restart with the original port in the label configuration.
+
+I set up a replica instance on a Raspberry Pi, so that I can have a backup DNS in case I need to take the server down for some reason. Just use the default config file (`${CONFIG_DIR}/adguard/adguardhome-sync.yaml`) from [the adguardhome-sync repo](https://github.com/bakito/adguardhome-sync) entering in the username and password for each, and you should be good to go! (Note: I turn off the stats and query log syncing because I find it useful to see what hits the fallback server)
 
 ### DNS/Networks
 
