@@ -29,8 +29,9 @@ services:
       - /sys:/host/sys:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.6
+    dns: ${SERVER_IP}
 
   # https://www.home-assistant.io/
   home:
@@ -56,14 +57,13 @@ services:
   esphome:
     image: esphome/esphome
     container_name: esphome
+    network_mode: host
     restart: unless-stopped
     environment:
       TZ: ${TZ}
     volumes:
       - ${CONFIG_DIR}/esphome:/config
-    networks:
-      - default
-    dns: ${GATEWAY_IP}
+    dns: ${SERVER_IP}
 
   # https://github.com/cdr/code-server
   code:
@@ -80,8 +80,9 @@ services:
       - ${CONFIG_DIR}/code:/config
       - ${CODE_DIR}:/home/code
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.8
+    dns: ${SERVER_IP}
 
   # https://github.com/cfbender/personal-site
   personal-site:
@@ -97,8 +98,9 @@ services:
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       HOSTNAME: ${COOKIE_DOMAIN}
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.9
+    dns: ${SERVER_IP}
     labels:
       com.centurylinklabs.watchtower.enable: "false"
 
@@ -107,6 +109,7 @@ services:
     image: adguard/adguardhome
     container_name: adguard
     restart: unless-stopped
+    network_mode: host
     volumes:
       - ${DATA_DIR}/adguard:/opt/adguardhome/work
       - ${CONFIG_DIR}/adguard:/opt/adguardhome/conf
@@ -114,9 +117,7 @@ services:
       - 53:53/tcp
       - 53:53/udp
       - 3333:3000/tcp
-    networks:
-      default:
-        ipv4_address: 172.20.69.53
+    dns: ${GATEWAY_IP}
 
   # https://github.com/bakito/adguardhome-sync/
   adguard-sync:
@@ -132,7 +133,10 @@ services:
       - ${CONFIG_DIR}/adguard:/config
     ports:
       - 8090:8080
-    dns: 172.20.69.53
+    networks:
+      default:
+        ipv4_address: 172.20.69.10
+    dns: ${SERVER_IP}
 
  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
@@ -147,8 +151,9 @@ services:
       - AUTH_HOST=${AUTH_HOST}
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.11
+    dns: ${SERVER_IP}
 
   # https://github.com/containrrr/watchtower/ 
   watchtower:
@@ -162,8 +167,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.12
+    dns: ${SERVER_IP}
 
   # https://github.com/portainer/portainer
   portainer:
@@ -175,8 +181,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_DIR}/portainer:/data
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.13
+    dns: ${SERVER_IP}
 
   # https://github.com/zwave-js/zwavejs2mqtt
   zwave:
@@ -190,11 +197,10 @@ services:
       - ${ZWAVE_SERIAL_PATH}:/dev/zwave
     ports:
       - 8484:3000
-    expose:
-      - 8484
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.14
+    dns: ${SERVER_IP}
 
   # https://github.com/linuxserver/docker-unifi-controller
   unifi:
@@ -206,15 +212,16 @@ services:
       PGID: ${PGID}
     volumes:
       - ${CONFIG_DIR}/unifi:/config
-    networks:
-      - default
     ports:
       - 3478:3478/udp
       - 10001:10001/udp
       - 8080:8080
       - 8443:8443
       - 6789:6789 # optional
-    dns: 172.20.69.53
+    networks:
+      default:
+        ipv4_address: 172.20.69.15
+    dns: ${SERVER_IP}
 
   # https://github.com/BookStackApp/BookStack
   bookstack:
@@ -234,8 +241,9 @@ services:
     depends_on:
       - bookstack_db
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.16
+    dns: ${SERVER_IP}
 
   bookstack_db:
     image: lscr.io/linuxserver/mariadb
@@ -252,8 +260,9 @@ services:
     volumes:
       - ${DATA_DIR}/bookstack_db:/config
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.17
+    dns: ${SERVER_IP}
 
   # https://github.com/linuxserver/docker-wireguard
   wireguard:
@@ -278,8 +287,7 @@ services:
       - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-    networks:
-      - default
+    dns: ${SERVER_IP}
 
   mosquitto:
     image: eclipse-mosquitto
@@ -290,17 +298,15 @@ services:
     ports:
       - 1883:1883/tcp
       - 9001:9001/tcp
-    expose:
-      - 1883
-      - 9001
     volumes:
       - ${CONFIG_DIR}/mosquitto:/mosquitto/config
       - ${DATA_DIR}/mosquitto:/mosquitto/data
       - ${DATA_DIR}/mosquitto/log:/mosquitto/log
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - default
-    dns: 172.20.69.53
+      default:
+        ipv4_address: 172.20.69.18
+    dns: ${SERVER_IP}
   
   fail2ban:
     image: crazymax/fail2ban:latest
@@ -316,6 +322,4 @@ services:
       - ./traefik/log/access.log:/var/log/access.log:ro
       - ${CONFIG_DIR}/home/home-assistant.log:/var/log/home-assistant.log:ro
       - /var/log/auth.log:/var/log/auth.log:ro
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+    dns: ${SERVER_IP}

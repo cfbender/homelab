@@ -95,6 +95,8 @@ I have set up only the single default network, and assigned it a subnet so that 
 
 In order to see container names in AdGuard, set `[/69.20.172.in-addr.arpa/]127.0.0.11` in the "Private DNS servers" field in AdGuard. This tells AdGuard to send PTR requests in the docker network to the internal docker DNS resolver. The main downside here is that any containers that run in "host" mode (in this case, just Home Assistant) will show up in AdGuard as the subnet gateway address for the internal network.
 
+I have a couple of containers in "host" networking mode, this is to mainly make a few things work a little cleaner (UPnP, mDNS, DNS over IPv6). You can turn these off if you don't want any of these.
+
 ### Home assistant
 
 Using the [linuxserver](https://linuxserver.io) container fixes many issues you may run into with Home Assistant docker, however the networking can still be an issue. The network mode needs to be `host`, so that it can discover and manage devices on the network, and then this the interface is exposed to traefik through `extra_hosts`. I also have the DNS pointing to AdGuard so that it can resolve local hostnames.
