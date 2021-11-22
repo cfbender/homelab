@@ -3,6 +3,8 @@ version: "3.7"
 networks:
   default:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: ${SERVER_IP}
     ipam:
       config:
         - subnet: 172.20.69.0/24

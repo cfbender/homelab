@@ -127,6 +127,18 @@ http:
     - 198.41.128.0/17
 ```
 
+If you have any devices (in my case a Xiaomi Air Purifier 3H) that don't seem to be able to discover, you may want to put them on the same VLAN. I did this by running the following commands:
+
+```sh
+echo -e '[keyfile]\nunmanaged-devices=none' | sudo tee -a /etc/NetworkManager/conf.d/10-globally-managed-devices.conf
+sudo nmcli con add type vlan con-name enp0s25@vlan10 dev enp0s25 id 10
+sudo service network-manager restart
+```
+
+I had previously set up a VLAN 10 tagged port on the switch for my server, with the base network as the secure network.
+
+This should allow device discovery with the devices being in separate VLANs
+
 ### Fail2Ban
 
 This is set up to ban the real client IP in cloudflare, as well as the local iptables just for funsies (though my firewall does that job already). It is set up for all traefik applications by reading the access log, but home assistant for some reason decided to return a `200` even on a failed login. So there is another jail that reads the home assistant logs as well.
