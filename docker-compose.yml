@@ -52,7 +52,7 @@ services:
     devices: 
       - /dev/ttyUSB1:/dev/ttyUSB1
     ports:
-      - 8123:8123
+      - ${SERVER_IP}:8123:8123
     dns: ${SERVER_IP}
 
   # https://github.com/esphome/esphome
@@ -165,6 +165,7 @@ services:
       TZ: ${TZ}
       WATCHTOWER_NOTIFICATIONS: "shoutrrr"
       WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
+      WATCHTOWER_CLEANUP: "true"
     command: --schedule "0 0 20 * * *" # runs daily at 8 PM
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
