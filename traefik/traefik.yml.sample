@@ -4,7 +4,8 @@ log:
 accessLog:
   filePath: /var/log/access.log
   filters:
-    statusCodes: "400-499"
+    statusCodes: 
+      - "400-499"
 
 api: {}
 
