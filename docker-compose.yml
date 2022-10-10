@@ -9,7 +9,6 @@ networks:
       config:
         - subnet: 172.20.69.0/24
 
-
 services:
   # https://hub.docker.com/r/netdata/netdata
   netdata:
@@ -49,10 +48,8 @@ services:
       - ${CONFIG_DIR}/home:/config
       - /etc/localtime:/etc/localtime:ro
       - ./fail2ban:/fail2ban
-    devices: 
+    devices:
       - /dev/ttyUSB1:/dev/ttyUSB1
-    ports:
-      - ${SERVER_IP}:8123:8123
     dns: ${SERVER_IP}
 
   # https://github.com/esphome/esphome
@@ -76,7 +73,7 @@ services:
       TZ: ${TZ}
       PUID: ${PUID}
       PGID: ${PGID}
-      SUDO_PASSWORD_HASH: ${CODE_SUDO_PASSWORD_HASH} 
+      SUDO_PASSWORD_HASH: ${CODE_SUDO_PASSWORD_HASH}
       PORT: ${CODE_PORT}
     volumes:
       - ${CONFIG_DIR}/code:/config
@@ -115,10 +112,6 @@ services:
     volumes:
       - ${DATA_DIR}/adguard:/opt/adguardhome/work
       - ${CONFIG_DIR}/adguard:/opt/adguardhome/conf
-    ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 3333:3000/tcp
     dns: ${GATEWAY_IP}
 
   # https://github.com/bakito/adguardhome-sync/
@@ -140,7 +133,7 @@ services:
         ipv4_address: 172.20.69.10
     dns: ${SERVER_IP}
 
- # https://github.com/thomseddon/traefik-forward-auth
+  # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth:2
     container_name: traefik-forward-auth
@@ -157,7 +150,7 @@ services:
         ipv4_address: 172.20.69.11
     dns: ${SERVER_IP}
 
-  # https://github.com/containrrr/watchtower/ 
+  # https://github.com/containrrr/watchtower/
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
@@ -196,7 +189,7 @@ services:
     tty: true
     volumes:
       - ${DATA_DIR}/zwavejs2mqtt:/usr/src/app/store
-    devices: 
+    devices:
       - ${ZWAVE_SERIAL_PATH}:/dev/zwave
     ports:
       - 8484:3000
@@ -210,7 +203,7 @@ services:
     image: lscr.io/linuxserver/unifi-controller
     container_name: unifi
     restart: unless-stopped
-    environment: 
+    environment:
       PUID: ${PUID}
       PGID: ${PGID}
     volumes:
@@ -310,7 +303,7 @@ services:
       default:
         ipv4_address: 172.20.69.18
     dns: ${SERVER_IP}
-  
+
   fail2ban:
     image: crazymax/fail2ban:latest
     container_name: fail2ban

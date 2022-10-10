@@ -4,7 +4,7 @@ log:
 accessLog:
   filePath: /var/log/access.log
   filters:
-    statusCodes: 
+    statusCodes:
       - "400-499"
 
 api: {}
@@ -13,7 +13,7 @@ providers:
   docker:
     exposedByDefault: false
 
-entrypoints:
+entryPoints:
   web:
     address: ":80"
     http:
