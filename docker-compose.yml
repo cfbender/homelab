@@ -137,6 +137,7 @@ services:
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth:2
     container_name: traefik-forward-auth
+    restart: unless-stopped
     environment:
       - PROVIDERS_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - PROVIDERS_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -154,6 +155,7 @@ services:
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
+    restart: unless-stopped
     environment:
       TZ: ${TZ}
       WATCHTOWER_NOTIFICATIONS: "shoutrrr"
@@ -307,6 +309,7 @@ services:
   fail2ban:
     image: crazymax/fail2ban:latest
     container_name: fail2ban
+    restart: unless-stopped
     network_mode: host
     environment:
       TZ: ${TZ}
@@ -318,4 +321,37 @@ services:
       - ./traefik/log/access.log:/var/log/access.log:ro
       - ${CONFIG_DIR}/home/home-assistant.log:/var/log/home-assistant.log:ro
       - /var/log/auth.log:/var/log/auth.log:ro
+    dns: ${SERVER_IP}
+
+  # https://github.com/benbusby/whoogle-search
+  whoogle:
+    image: benbusby/whoogle-search
+    container_name: whoogle
+    restart: unless-stopped
+    pids_limit: 50
+    mem_limit: 256mb
+    memswap_limit: 256mb
+    # user debian-tor from tor package
+    user: whoogle
+    security_opt:
+      - no-new-privileges
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /config/:size=10M,uid=927,gid=927,mode=1700
+      - /var/lib/tor/:size=15M,uid=927,gid=927,mode=1700
+      - /run/tor/:size=1M,uid=927,gid=927,mode=1700
+    environment:
+      TZ: ${TZ}
+      WHOOGLE_CONFIG_THEME: system
+      WHOOGLE_CONFIG_PREFERENCES_ENCRYPTED: 1
+      WHOOGLE_CONFIG_PREFERENCES_KEY: ${WHOOGLE_PREFERENCES_KEY}
+      WHOOGLE_CONFIG_COUNTRY: US
+      WHOOGLE_CONFIG_SEARCH_LANGUAGE: lang_en
+      WHOOGLE_CONFIG_GET_ONLY: 1
+      WHOOGLE_CONFIG_DISABLE: 0
+      WHOOGLE_CONFIG_VIEW_IMAGE: 1
+      WHOOGLE_CONFIG_NEW_TAB: 0
+    ports:
+      - 5000:5000/tcp
     dns: ${SERVER_IP}

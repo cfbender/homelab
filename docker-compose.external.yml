@@ -15,7 +15,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.traefik-forward-auth.tls.certresolver: prod
       traefik.http.routers.traefik-forward-auth.rule: Host(`${AUTH_HOST}`)
-      traefik.http.routers.traefik-forward-auth.middlewares:  traefik-forward-auth
+      traefik.http.routers.traefik-forward-auth.middlewares: traefik-forward-auth
       traefik.http.middlewares.traefik-forward-auth.forwardauth.address: http://traefik-forward-auth:4181
       traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders: X-Forwarded-User
       traefik.http.services.traefik-forward-auth.loadbalancer.server.port: 4181
@@ -70,7 +70,7 @@ services:
       traefik.http.routers.adguard.rule: Host(`${ADGUARD_HOST}`)
       traefik.http.routers.adguard.middlewares: hsts-header
       # Be sure to configure this after install to bind to this port instead of 80!
-      traefik.http.services.adguard.loadbalancer.server.port: 3333 
+      traefik.http.services.adguard.loadbalancer.server.port: 3333
       traefik.http.services.adguard.loadbalancer.server.scheme: http
 
   portainer:
@@ -112,6 +112,16 @@ services:
       traefik.http.routers.bookstack.middlewares: hsts-header
       traefik.http.services.bookstack.loadbalancer.server.port: 80
       traefik.http.services.bookstack.loadbalancer.server.scheme: http
+
+  whoogle:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.whoogle.tls.certresolver: prod
+      traefik.http.routers.whoogle.rule: Host(`${WHOOGLE_HOST}`)
+      traefik.http.routers.whoogle.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.whoogle.loadbalancer.server.port: 5000
+      traefik.http.services.whoogle.loadbalancer.server.scheme: http
 
   # https://hub.docker.com/_/traefik/
   traefik:
