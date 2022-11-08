@@ -117,6 +117,9 @@ services:
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
+      traefik.http.routers.whoogle-opensearch.tls.certresolver: prod
+      traefik.http.routers.whoogle-opensearch.rule: "(Host(`${WHOOGLE_HOST}`) && Path(`/opensearch.xml`))"
+      traefik.http.routers.whoogle-opensearch.middlewares: hsts-header
       traefik.http.routers.whoogle.tls.certresolver: prod
       traefik.http.routers.whoogle.rule: Host(`${WHOOGLE_HOST}`)
       traefik.http.routers.whoogle.middlewares: hsts-header, traefik-forward-auth
