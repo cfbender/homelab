@@ -373,8 +373,15 @@ services:
       WHOOGLE_CONFIG_DISABLE: 0
       WHOOGLE_CONFIG_VIEW_IMAGE: 1
       WHOOGLE_CONFIG_NEW_TAB: 0
+      NODE_ENV: production
     ports:
       - 8081:80/tcp
     dns: ${SERVER_IP}
     volumes:
       - ${CONFIG_DIR}/dashy/dashy-conf.yml:/app/public/conf.yml
+    healthcheck:
+      test: ["CMD", "node", "/app/services/healthcheck"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
