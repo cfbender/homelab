@@ -126,6 +126,16 @@ services:
       traefik.http.services.whoogle.loadbalancer.server.port: 5000
       traefik.http.services.whoogle.loadbalancer.server.scheme: http
 
+  dashy:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.dashy.tls.certresolver: prod
+      traefik.http.routers.dashy.rule: Host(`${DASHY_HOST}`)
+      traefik.http.routers.dashy.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.dashy.loadbalancer.server.port: 80
+      traefik.http.services.dashy.loadbalancer.server.scheme: http
+
   # https://hub.docker.com/_/traefik/
   traefik:
     image: traefik:latest

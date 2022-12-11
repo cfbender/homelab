@@ -2,6 +2,7 @@ version: "3.7"
 
 networks:
   default:
+    name: "homelab_default"
     driver: bridge
     driver_opts:
       com.docker.network.bridge.host_binding_ipv4: ${SERVER_IP}
@@ -355,3 +356,25 @@ services:
     ports:
       - 5000:5000/tcp
     dns: ${SERVER_IP}
+
+  #https://github.com/Lissy93/dashy
+  dashy:
+    image: lissy93/dashy:latest
+    container_name: dashy
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+      WHOOGLE_CONFIG_THEME: system
+      WHOOGLE_CONFIG_PREFERENCES_ENCRYPTED: 1
+      WHOOGLE_CONFIG_PREFERENCES_KEY: ${WHOOGLE_PREFERENCES_KEY}
+      WHOOGLE_CONFIG_COUNTRY: US
+      WHOOGLE_CONFIG_SEARCH_LANGUAGE: lang_en
+      WHOOGLE_CONFIG_GET_ONLY: 1
+      WHOOGLE_CONFIG_DISABLE: 0
+      WHOOGLE_CONFIG_VIEW_IMAGE: 1
+      WHOOGLE_CONFIG_NEW_TAB: 0
+    ports:
+      - 8081:80/tcp
+    dns: ${SERVER_IP}
+    volumes:
+      - ${CONFIG_DIR}/dashy/dashy-conf.yml:/app/public/conf.yml
