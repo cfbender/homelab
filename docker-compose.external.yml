@@ -32,7 +32,6 @@ services:
   esphome:
     labels:
       traefik.enable: "true"
-      traefik.docker.network: homelab_default
       traefik.http.routers.esphome.tls.certresolver: prod
       traefik.http.routers.esphome.rule: Host(`${ESPHOME_HOST}`)
       traefik.http.routers.esphome.middlewares: hsts-header, traefik-forward-auth
@@ -65,7 +64,6 @@ services:
   adguard:
     labels:
       traefik.enable: "true"
-      traefik.docker.network: homelab_default
       traefik.http.routers.adguard.tls.certresolver: prod
       traefik.http.routers.adguard.rule: Host(`${ADGUARD_HOST}`)
       traefik.http.routers.adguard.middlewares: hsts-header

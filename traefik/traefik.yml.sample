@@ -16,6 +16,15 @@ providers:
 entryPoints:
   web:
     address: ":80"
+    forwardedHeaders:
+      insecure: false
+      trustedIPs:
+        - 172.16.0.0/16
+    proxyProtocol:
+      insecure: false
+      trustedIPs:
+        - 10.0.69.0/24
+        - 172.16.0.0/16
     http:
       redirections:
         entrypoint:
@@ -23,8 +32,17 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
-    forwardedHeaders:
+    proxyProtocol:
+      insecure: false
       trustedIPs:
+        - 10.0.69.0/24
+        - 172.16.0.0/16
+    forwardedHeaders:
+      insecure: false
+      trustedIPs:
+        - 10.0.69.0/24
+        - 172.16.0.0/16
+        - 172.16.0.0/16
         - 127.17.0.1/32
         - 103.21.244.0/22
         - 103.22.200.0/22

@@ -147,6 +147,7 @@ services:
       - LOG_LEVEL=debug
       - AUTH_HOST=${AUTH_HOST}
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
+      - LIFETIME=604800 # 1 week
     networks:
       default:
         ipv4_address: 172.20.69.11
