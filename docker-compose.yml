@@ -409,3 +409,82 @@ services:
       EDISON_MECHMARKET_QUERY: ${EDISON_MECHMARKET_QUERY}
       EDISON_MECHMARKET_CHANNEL: ${EDISON_MECHMARKET_CHANNEL}
       EDISON_BOT_TOKEN: ${EDISON_BOT_TOKEN}
+
+  #https://github.com/LemmyNet/lemmy
+  lemmy:
+    image: dessalines/lemmy
+    container_name: lemmy
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+      LEMMY_DATABASE_URL: postgres://${LEMMY_DB_USER}:${LEMMY_DB_PASSWORD}@postgres:5432/${LEMMY_DB}
+      LEMMY_CORS_ORIGIN: https://${LEMMY_HOST}
+    dns: ${SERVER_IP}
+    depends_on:
+      - lemmy-postgres
+      - pictrs
+    volumes:
+      - ${CONFIG_DIR}/lemmy/lemmy.hjson:/config/config.hjson:Z
+
+  lemmy-ui:
+    image: dessalines/lemmy-ui
+    container_name: lemmy-ui
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+      # this needs to match the hostname defined in the lemmy service
+      LEMMY_UI_LEMMY_INTERNAL_HOST: lemmy:8536
+      # set the outside hostname here
+      LEMMY_UI_LEMMY_EXTERNAL_HOST: ${LEMMY_HOST}
+      LEMMY_HTTPS: "false"
+    depends_on:
+      - lemmy
+
+  pictrs:
+    image: asonix/pictrs
+    # this needs to match the pictrs url in lemmy.hjson
+    hostname: pictrs
+    restart: unless-stopped
+    # we can set options to pictrs like this, here we set max. image size and forced format for conversion
+    # entrypoint: /sbin/tini -- /usr/local/bin/pict-rs -p /mnt -m 4 --image-format webp
+    environment:
+      - PICTRS__API_KEY=${PICTRS_API_KEY}
+      - PICTRS__MEDIA__VIDEO_CODEC=vp9
+      - PICTRS__MEDIA__GIF__MAX_WIDTH=256
+      - PICTRS__MEDIA__GIF__MAX_HEIGHT=256
+      - PICTRS__MEDIA__GIF__MAX_AREA=65536
+      - PICTRS__MEDIA__GIF__MAX_FRAME_COUNT=400
+    user: 991:991
+    volumes:
+      - ${DATA_DIR}/pictrs:/mnt:Z
+
+  lemmy-postgres:
+    image: postgres:15-alpine
+    # this needs to match the database host in lemmy.hson
+    # Tune your settings via
+    # https://pgtune.leopard.in.ua/#/
+    # You can use this technique to add them here
+    # https://stackoverflow.com/a/30850095/1655478
+    restart: unless-stopped
+    hostname: postgres
+    command:
+      [
+        "postgres",
+        "-c",
+        "session_preload_libraries=auto_explain",
+        "-c",
+        "auto_explain.log_min_duration=5ms",
+        "-c",
+        "auto_explain.log_analyze=true",
+        "-c",
+        "track_activity_query_size=1048576",
+      ]
+    ports:
+      # use a different port so it doesnt conflict with potential postgres db running on the host
+      - 5433:5432
+    environment:
+      POSTGRES_USER: ${LEMMY_DB_USER}
+      POSTGRES_PASSWORD: ${LEMMY_DB_PASSWORD}
+      POSTGRES_DB: ${LEMMY_DB}
+    volumes:
+      - ${DATA_DIR}/postgres:/var/lib/postgresql/data:Z
