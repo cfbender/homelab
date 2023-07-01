@@ -11,6 +11,44 @@ networks:
         - subnet: 172.20.69.0/24
 
 services:
+  # https://hub.docker.com/_/traefik/
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    environment:
+      TZ: "${TZ}"
+      CF_API_EMAIL: "${CF_API_EMAIL}"
+      CF_API_KEY: "${CF_API_KEY}"
+    networks:
+      - default
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/log:/var/log
+      - ./traefik:/etc/traefik:rw
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.traefik.tls.certresolver: prod
+      traefik.http.routers.traefik.rule: Host(`${TRAEFIK_HOST}`)
+      traefik.http.routers.traefik.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.traefik.service: api@internal
+      traefik.http.middlewares.test-auth.basicauth.users: "${BASICAUTH_USERS}"
+      traefik.http.middlewares.basicauth.basicauth.usersfile: /etc/traefik/.htpasswd
+      traefik.http.middlewares.ipallowlist.ipwhitelist.sourcerange: "${IPALLOWLIST}"
+      traefik.http.middlewares.hsts-header.headers.customResponseHeaders.Strict-Transport-Security: "max-age=63072000"
+    extra_hosts:
+      - host.docker.internal:172.17.0.1
+
   # https://hub.docker.com/r/netdata/netdata
   netdata:
     image: netdata/netdata
@@ -32,8 +70,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       default:
-        ipv4_address: 172.20.69.6
+        ipv4_address: 172.20.69.43
     dns: ${SERVER_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.netdata.tls.certresolver: prod
+      traefik.http.routers.netdata.rule: Host(`${NETDATA_HOST}`)
+      traefik.http.routers.netdata.middlewares: hsts-header, traefik-forward-auth
 
   # https://github.com/esphome/esphome
   esphome:
@@ -46,6 +90,13 @@ services:
     volumes:
       - ${CONFIG_DIR}/esphome:/config
     dns: ${SERVER_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.esphome.tls.certresolver: prod
+      traefik.http.routers.esphome.rule: Host(`${ESPHOME_HOST}`)
+      traefik.http.routers.esphome.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.esphome.loadbalancer.server.port: 6052
+      traefik.http.services.esphome.loadbalancer.server.scheme: http
 
   # https://github.com/cdr/code-server
   code:
@@ -65,6 +116,14 @@ services:
       default:
         ipv4_address: 172.20.69.8
     dns: ${SERVER_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.code.tls.certresolver: prod
+      traefik.http.routers.code.rule: Host(`${CODE_HOST}`)
+      traefik.http.routers.code.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.code.loadbalancer.server.port: ${CODE_PORT}
+      traefik.http.services.code.loadbalancer.server.scheme: http
 
   # https://github.com/cfbender/personal-site
   personal-site:
@@ -74,7 +133,6 @@ services:
       dockerfile: Dockerfile
       args:
         - SHOW_DASHBOARD=true
-    container_name: personal-site
     restart: unless-stopped
     environment:
       PORT: ${WWW_PORT}
@@ -86,6 +144,16 @@ services:
     dns: ${SERVER_IP}
     labels:
       com.centurylinklabs.watchtower.enable: "false"
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.personal-site.tls.certresolver: prod
+      traefik.http.routers.personal-site.rule: "Host(`${PERSONAL_SITE_HOST}`) || Host(`${COOKIE_DOMAIN}`)"
+      traefik.http.routers.personal-site.middlewares: hsts-header
+      traefik.http.routers.personal-site-dashboard.tls.certresolver: prod
+      traefik.http.routers.personal-site-dashboard.rule: "(Host(`${PERSONAL_SITE_HOST}`) || Host(`${COOKIE_DOMAIN}`)) && PathPrefix(`${DASHBOARD_PATH}`)"
+      traefik.http.routers.personal-site-dashboard.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.personal-site.loadbalancer.server.port: ${WWW_PORT}
+      traefik.http.services.personal-site.loadbalancer.server.scheme: http
 
   # https://registry.hub.docker.com/r/adguard/adguardhome
   adguard:
@@ -97,6 +165,14 @@ services:
       - ${DATA_DIR}/adguard:/opt/adguardhome/work
       - ${CONFIG_DIR}/adguard:/opt/adguardhome/conf
     dns: ${GATEWAY_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.adguard.tls.certresolver: prod
+      traefik.http.routers.adguard.rule: Host(`${ADGUARD_HOST}`)
+      traefik.http.routers.adguard.middlewares: hsts-header
+      # Be sure to configure this after install to bind to this port instead of 80!
+      traefik.http.services.adguard.loadbalancer.server.port: 3333
+      traefik.http.services.adguard.loadbalancer.server.scheme: http
 
   # https://github.com/bakito/adguardhome-sync/
   adguard-sync:
@@ -135,6 +211,15 @@ services:
       default:
         ipv4_address: 172.20.69.11
     dns: ${SERVER_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.traefik-forward-auth.tls.certresolver: prod
+      traefik.http.routers.traefik-forward-auth.rule: Host(`${AUTH_HOST}`)
+      traefik.http.routers.traefik-forward-auth.middlewares: traefik-forward-auth
+      traefik.http.middlewares.traefik-forward-auth.forwardauth.address: http://traefik-forward-auth:4181
+      traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders: X-Forwarded-User
+      traefik.http.services.traefik-forward-auth.loadbalancer.server.port: 4181
 
   # https://github.com/containrrr/watchtower/
   watchtower:
@@ -168,6 +253,14 @@ services:
       default:
         ipv4_address: 172.20.69.13
     dns: ${SERVER_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.portainer.tls.certresolver: prod
+      traefik.http.routers.portainer.rule: Host(`${PORTAINER_HOST}`)
+      traefik.http.routers.portainer.middlewares: hsts-header
+      traefik.http.services.portainer.loadbalancer.server.port: 9000
+      traefik.http.services.portainer.loadbalancer.server.scheme: http
 
   # https://github.com/linuxserver/docker-unifi-controller
   unifi:
@@ -189,6 +282,14 @@ services:
       default:
         ipv4_address: 172.20.69.15
     dns: ${SERVER_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.unifi.tls.certresolver: prod
+      traefik.http.routers.unifi.rule: Host(`${UNIFI_HOST}`)
+      traefik.http.routers.unifi.middlewares: hsts-header
+      traefik.http.services.unifi.loadbalancer.server.port: 8443
+      traefik.http.services.unifi.loadbalancer.server.scheme: https
 
   # https://github.com/BookStackApp/BookStack
   bookstack:
@@ -211,6 +312,14 @@ services:
       default:
         ipv4_address: 172.20.69.16
     dns: ${SERVER_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.bookstack.tls.certresolver: prod
+      traefik.http.routers.bookstack.rule: Host(`${BOOKSTACK_HOST}`)
+      traefik.http.routers.bookstack.middlewares: hsts-header
+      traefik.http.services.bookstack.loadbalancer.server.port: 80
+      traefik.http.services.bookstack.loadbalancer.server.scheme: http
 
   bookstack_db:
     image: lscr.io/linuxserver/mariadb
@@ -324,6 +433,17 @@ services:
     ports:
       - 5000:5000/tcp
     dns: ${SERVER_IP}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.whoogle-opensearch.tls.certresolver: prod
+      traefik.http.routers.whoogle-opensearch.rule: "(Host(`${WHOOGLE_HOST}`) && Path(`/opensearch.xml`))"
+      traefik.http.routers.whoogle-opensearch.middlewares: hsts-header
+      traefik.http.routers.whoogle.tls.certresolver: prod
+      traefik.http.routers.whoogle.rule: Host(`${WHOOGLE_HOST}`)
+      traefik.http.routers.whoogle.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.whoogle.loadbalancer.server.port: 5000
+      traefik.http.services.whoogle.loadbalancer.server.scheme: http
 
   #https://github.com/Lissy93/dashy
   dashy:
@@ -353,6 +473,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.dashy.tls.certresolver: prod
+      traefik.http.routers.dashy.rule: Host(`${DASHY_HOST}`)
+      traefik.http.routers.dashy.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.services.dashy.loadbalancer.server.port: 80
+      traefik.http.services.dashy.loadbalancer.server.scheme: http
 
   #https://github.com/cfbender/edison
   edison:
@@ -390,6 +518,14 @@ services:
       - pictrs
     volumes:
       - ${CONFIG_DIR}/lemmy/lemmy.hjson:/config/config.hjson:Z
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.lemmy.tls.certresolver: prod
+      traefik.http.routers.lemmy.rule: Host(`${LEMMY_HOST}`) && (Path(`/{path:(api|pictrs|feeds|nodeinfo|.well-known).*}`) || METHOD(`POST`) || HeadersRegexp(`Accept`, `^application/.*$$`))
+      traefik.http.routers.lemmy.middlewares: hsts-header
+      traefik.http.services.lemmy.loadbalancer.server.port: 8536
+      traefik.http.services.lemmy.loadbalancer.server.scheme: http
 
   lemmy-ui:
     image: dessalines/lemmy-ui
@@ -404,6 +540,14 @@ services:
       LEMMY_HTTPS: "false"
     depends_on:
       - lemmy
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.lemmy-ui.tls.certresolver: prod
+      traefik.http.routers.lemmy-ui.rule: Host(`${LEMMY_HOST}`)
+      traefik.http.routers.lemmy-ui.middlewares: hsts-header
+      traefik.http.services.lemmy-ui.loadbalancer.server.port: 1234
+      traefik.http.services.lemmy-ui.loadbalancer.server.scheme: http
 
   pictrs:
     image: asonix/pictrs

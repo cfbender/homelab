@@ -33,7 +33,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [edison](https://github.com/cfbender/edison) - a little discord bot I run for some random tasks \*
 - [lemmy](https://github.com/LemmyNet/lemmy-ui) - The official web app for lemmy \*\*
 
-\*not exposed even in external configuration
+\*not exposed
 
 \*\* including the lemmy, lemmy-ui, postgres and pictrs containers
 
@@ -41,31 +41,11 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 
 - dedicated server or PC
 - [docker](https://docs.docker.com/install/linux/docker-ce/debian/) and [docker-compose](https://docs.docker.com/compose/install/#install-compose)
-- (optional) personal domain with configurable sub-domains (eg. netdata.example.com)
+- personal domain with configurable sub-domains (eg. netdata.example.com)
 
-## Internal Configuration (local network only)
-
-Copy `env.sample` to `.env` and populate all fields in the `COMMON` section.
-
-Create a link in order to append `docker-compose.internal.yml` to future docker-compose commands.
-
-```bash
-ln -sf docker-compose.internal.yml docker-compose.override.yml
-```
-
-Review the merged configs by running `docker-compose config`.
-
-## External Configuration (exposed to internet)
+## Configuration (exposed to internet)
 
 Copy `env.sample` to `.env` and populate all fields in the `COMMON` and `EXTERNAL` sections.
-
-Create a link in order to append `docker-compose.external.yml` to future docker-compose commands.
-
-```bash
-ln -sf docker-compose.external.yml docker-compose.override.yml
-```
-
-Review the merged configs by running `docker-compose config`.
 
 Copy `traefik/traefik.yml.sample` to `traefik/traefik.yml` and fill in the `ACME_EMAIL` and `PILOT_TOKEN` variables (the pilot token is an optional property for Traefik Pilot, feel free to remove the section all-together).
 
