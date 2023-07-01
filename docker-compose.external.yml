@@ -20,15 +20,6 @@ services:
       traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders: X-Forwarded-User
       traefik.http.services.traefik-forward-auth.loadbalancer.server.port: 4181
 
-  home:
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.home.tls.certresolver: prod
-      traefik.http.routers.home.rule: Host(`${HOME_ASSISTANT_HOST}`)
-      traefik.http.routers.home.middlewares: hsts-header
-      traefik.http.services.home.loadbalancer.server.port: 8123
-      traefik.http.services.home.loadbalancer.server.scheme: http
-
   esphome:
     labels:
       traefik.enable: "true"
@@ -81,16 +72,6 @@ services:
       traefik.http.services.portainer.loadbalancer.server.port: 9000
       traefik.http.services.portainer.loadbalancer.server.scheme: http
 
-  zwave:
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.zwave.tls.certresolver: prod
-      traefik.http.routers.zwave.rule: Host(`${ZWAVE_HOST}`)
-      traefik.http.routers.zwave.middlewares: hsts-header
-      traefik.http.services.zwave.loadbalancer.server.port: 8091
-      traefik.http.services.zwave.loadbalancer.server.scheme: http
-
   unifi:
     labels:
       traefik.enable: "true"
@@ -139,7 +120,7 @@ services:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
       traefik.http.routers.lemmy.tls.certresolver: prod
-      traefik.http.routers.lemmy.rule: Host(`${LEMMY_HOST}`) && (Path(`/{path:(api|pictrs|feeds|nodeinfo|.well-known).*}`) || METHOD(`POST`) || HeadersRegexp(`Accept`, `{accept:^application/.*$$}`))
+      traefik.http.routers.lemmy.rule: Host(`${LEMMY_HOST}`) && (Path(`/{path:(api|pictrs|feeds|nodeinfo|.well-known).*}`) || METHOD(`POST`) || HeadersRegexp(`Accept`, `^application/.*$$`))
       traefik.http.routers.lemmy.middlewares: hsts-header
       traefik.http.services.lemmy.loadbalancer.server.port: 8536
       traefik.http.services.lemmy.loadbalancer.server.scheme: http

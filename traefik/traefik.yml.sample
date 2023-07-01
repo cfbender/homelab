@@ -12,6 +12,9 @@ api: {}
 providers:
   docker:
     exposedByDefault: false
+  file:
+    directory: /etc/traefik/conf
+    watch: true
 
 entryPoints:
   web:

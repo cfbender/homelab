@@ -35,24 +35,6 @@ services:
         ipv4_address: 172.20.69.6
     dns: ${SERVER_IP}
 
-  # https://www.home-assistant.io/
-  home:
-    image: lscr.io/linuxserver/homeassistant
-    container_name: home
-    restart: unless-stopped
-    network_mode: host
-    environment:
-      TZ: ${TZ}
-      PUID: ${PUID}
-      PGID: ${PGID}
-    volumes:
-      - ${CONFIG_DIR}/home:/config
-      - /etc/localtime:/etc/localtime:ro
-      - ./fail2ban:/fail2ban
-    devices:
-      - /dev/ttyUSB2:/dev/ttyUSB2
-    dns: ${SERVER_IP}
-
   # https://github.com/esphome/esphome
   esphome:
     image: esphome/esphome
@@ -185,23 +167,6 @@ services:
     networks:
       default:
         ipv4_address: 172.20.69.13
-    dns: ${SERVER_IP}
-
-  # https://github.com/zwave-js/zwavejs2mqtt
-  zwave:
-    image: zwavejs/zwavejs2mqtt
-    container_name: zwave
-    restart: unless-stopped
-    tty: true
-    volumes:
-      - ${DATA_DIR}/zwavejs2mqtt:/usr/src/app/store
-    devices:
-      - ${ZWAVE_SERIAL_PATH}:/dev/zwave
-    ports:
-      - 8484:3000
-    networks:
-      default:
-        ipv4_address: 172.20.69.14
     dns: ${SERVER_IP}
 
   # https://github.com/linuxserver/docker-unifi-controller
