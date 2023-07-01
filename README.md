@@ -34,6 +34,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [lemmy](https://github.com/LemmyNet/lemmy-ui) - The official web app for lemmy \*\*
 
 \*not exposed even in external configuration
+
 \*\* including the lemmy, lemmy-ui, postgres and pictrs containers
 
 ## Requirements
