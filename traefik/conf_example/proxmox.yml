@@ -1,0 +1,19 @@
+http:
+  routers:
+    proxmox:
+      rule: "Host(`<PROXMOX HOST>`)"
+      service: proxmox
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: prod
+      middlewares:
+        - secure-headers@file
+        - traefik-forward-auth@docker
+
+  services:
+    proxmox:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "<PROXMOX URL>"

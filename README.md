@@ -16,22 +16,25 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 
 - [Netdata](https://www.netdata.cloud/) - Troubleshoot slowdowns and anomalies in your infrastructure with thousands of metrics, interactive visualizations, and insightful health alarms.
 - [Traefik](https://traefik.io/) - modern HTTP reverse proxy and load balancer that makes deploying microservices easy.
-- [Home Assistant](https://www.home-assistant.io/) - Open source home automation that puts local control and privacy first.
 - [ESPHome](https://esphome.io/) - system to control your ESP8266/ESP32 by simple yet powerful configuration files and control them remotely through Home Automation systems.
 - [code-server](https://github.com/cdr/code-server) - Run VS Code on any machine anywhere and access it in the browser.
 - [personal-site](https://github.com/cfbender/personal-site) - my personal site, built with Phoenix LiveView.
 - [AdGuard Home](https://adguard.com/en/adguard-home/overview.html) - network-wide software for blocking ads & tracking.
 - [Watchtower](https://containrrr.dev/watchtower/) - container-based solution for automating Docker container base image updates.
 - [Portainer CE](https://www.portainer.io/) - lightweight ‘universal’ management GUI that can be used to easily manage Docker, Swarm, Kubernetes and ACI environments.
-- [Z-waveJS2MQTT](https://github.com/zwave-js/zwavejs2mqtt) - Fully configurable Zwave to MQTT Gateway and Control Panel.
 - [Unifi controller](https://docs.linuxserver.io/images/docker-unifi-controller) - powerful, enterprise wireless software engine ideal for high-density client deployments requiring low latency and high uptime performance.
 - [Bookstack](https://www.bookstackapp.com/) - simple, self-hosted, easy-to-use platform for organising and storing information.
 - [Wireguard](https://www.wireguard.com/) - extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography.
 - [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) - scans log files and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. \*
 - [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. \*
 - [adguardhome-sync](https://github.com/bakito/adguardhome-sync)- Synchronize AdGuardHome config to a replica instance. \*
+- [dashy](https://github.com/Lissy93/dashy) - 🚀 A self-hostable personal dashboard built for you. Includes status-checking, widgets, themes, icon packs, a UI editor and tons more!
+- [whoogle](https://github.com/benbusby/whoogle-search) - A self-hosted, ad-free, privacy-respecting metasearch engine
+- [edison](https://github.com/cfbender/edison) - a little discord bot I run for some random tasks \*
+- [lemmy](https://github.com/LemmyNet/lemmy-ui) - The official web app for lemmy \*\*
 
 \*not exposed even in external configuration
+\*\* including the lemmy, lemmy-ui, postgres and pictrs containers
 
 ## Requirements
 
@@ -99,16 +102,17 @@ I have a couple of containers in "host" networking mode, this is to mainly make 
 
 ### Home assistant
 
-Using the [linuxserver](https://linuxserver.io) container fixes many issues you may run into with Home Assistant docker, however the networking can still be an issue. The network mode needs to be `host`, so that it can discover and manage devices on the network, and then this the interface is exposed to traefik through `extra_hosts`. I also have the DNS pointing to AdGuard so that it can resolve local hostnames.
+This stack utilizes Home Assistant via a VM managed in proxmox. I set it up using [this script from tteck](https://tteck.github.io/Proxmox/). The files in `traefik/conf_example` with the info filled in should get you going to route to the external host.
 
 Set the following into `${CONFIG_DIR}/home/configuration.yaml`:
+**Note:** for running HA at a different IP, you will need to include the server IP running this compose stack where the `<YOUR SERVER IP>` is.
 
 ```yaml
 http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
-    - 172.16.0.0/12
+    - <YOUR SERVER IP>
     # cloudflare IPs for skipping in X-Forwarded-For header
     - 103.21.244.0/22
     - 103.22.200.0/22
@@ -202,3 +206,5 @@ docker-compose exec traefik htpasswd /etc/traefik/.htpasswd <user2>
 Started with setup from [klutchell's mediaserver](https://github.com/klutchell/mediaserver)
 
 [Buy them a beer](https://buymeacoffee.com/klutchell)
+
+Special thanks to [brettinternet](https://github.com/brettinternet) for the help and inspiration along the way.

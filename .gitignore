@@ -2,6 +2,7 @@ data/
 !traefik
 traefik/*
 !traefik/traefik.yml.sample
+!traefik/conf_example
 fail2ban/db
 fail2ban/action.d/cloudflare.conf
 fail2ban/jail.d/jail.local

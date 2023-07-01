@@ -1,0 +1,19 @@
+http:
+  routers:
+    homeassistant:
+      rule: "Host(`<HA HOST>`)"
+      service: home
+      entryPoints:
+        - web
+        - websecure
+      tls:
+        certResolver: prod
+      middlewares:
+        - secure-headers@file
+
+  services:
+    home:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "<HA URL>"
