@@ -69,8 +69,7 @@ services:
       - /sys:/host/sys:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      default:
-        ipv4_address: 172.20.69.43
+      - default
     dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
@@ -113,8 +112,7 @@ services:
       - ${CONFIG_DIR}/code:/config
       - ${CODE_DIR}:/home/code
     networks:
-      default:
-        ipv4_address: 172.20.69.8
+      - default
     dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
@@ -139,8 +137,7 @@ services:
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       HOSTNAME: ${COOKIE_DOMAIN}
     networks:
-      default:
-        ipv4_address: 172.20.69.9
+      - default
     dns: ${SERVER_IP}
     labels:
       com.centurylinklabs.watchtower.enable: "false"
@@ -189,8 +186,7 @@ services:
     ports:
       - 8090:8080
     networks:
-      default:
-        ipv4_address: 172.20.69.10
+      - default
     dns: ${SERVER_IP}
 
   # https://github.com/thomseddon/traefik-forward-auth
@@ -208,8 +204,7 @@ services:
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
       - LIFETIME=604800 # 1 week
     networks:
-      default:
-        ipv4_address: 172.20.69.11
+      - default
     dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
@@ -236,8 +231,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      default:
-        ipv4_address: 172.20.69.12
+      - default
     dns: ${SERVER_IP}
 
   # https://github.com/portainer/portainer
@@ -250,8 +244,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_DIR}/portainer:/data
     networks:
-      default:
-        ipv4_address: 172.20.69.13
+      - default
     dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
@@ -279,8 +272,7 @@ services:
       - 8443:8443
       - 6789:6789 # optional
     networks:
-      default:
-        ipv4_address: 172.20.69.15
+      - default
     dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
@@ -309,8 +301,7 @@ services:
     depends_on:
       - bookstack_db
     networks:
-      default:
-        ipv4_address: 172.20.69.16
+      - default
     dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
@@ -336,8 +327,7 @@ services:
     volumes:
       - ${DATA_DIR}/bookstack_db:/config
     networks:
-      default:
-        ipv4_address: 172.20.69.17
+      - default
     dns: ${SERVER_IP}
 
   # https://github.com/linuxserver/docker-wireguard
@@ -380,8 +370,7 @@ services:
       - ${DATA_DIR}/mosquitto/log:/mosquitto/log
       - /etc/localtime:/etc/localtime:ro
     networks:
-      default:
-        ipv4_address: 172.20.69.18
+      - default
     dns: ${SERVER_IP}
 
   fail2ban:
@@ -597,3 +586,23 @@ services:
       POSTGRES_DB: ${LEMMY_DB}
     volumes:
       - ${DATA_DIR}/postgres:/var/lib/postgresql/data:Z
+
+  # https://github.com/hay-kot/homebox
+  homebox:
+    image: ghcr.io/hay-kot/homebox:latest
+    container_name: homebox
+    restart: unless-stopped
+    environment:
+      - HBOX_LOG_LEVEL=info
+      - HBOX_LOG_FORMAT=text
+      - HBOX_WEB_MAX_UPLOAD_SIZE=10
+    volumes:
+      - ${DATA_DIR}/homebox:/data/
+    ports:
+      - 3100:7745
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.homebox.tls.certresolver: prod
+      traefik.http.routers.homebox.rule: Host(`${HOMEBOX_HOST}`)
+      traefik.http.routers.homebox.middlewares: hsts-header, traefik-forward-auth

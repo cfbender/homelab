@@ -1,0 +1,19 @@
+http:
+  routers:
+    frigate:
+      rule: "Host(`<FRIGATE HOST>`)"
+      service: frigate
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: prod
+      middlewares:
+        - secure-headers@file
+        - traefik-forward-auth@docker
+
+  services:
+    frigate:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "<FRIGATE URL>"
