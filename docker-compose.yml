@@ -330,6 +330,23 @@ services:
       - default
     dns: ${SERVER_IP}
 
+  # https://hub.docker.com/r/tailscale/tailscale
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      TZ: ${TZ}
+      TS_AUTHKEY: ${TAILSCALE_AUTH_KEY}
+      TS_ROUTES: ${TAILSCALE_ADVERTISED_ROUTES}
+    volumes:
+      - /var/lib:/var/lib
+      - /dev/net/tun:/dev/net/tun
+
   mosquitto:
     image: eclipse-mosquitto
     container_name: mosquitto
