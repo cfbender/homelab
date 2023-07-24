@@ -588,6 +588,7 @@ services:
       - HBOX_LOG_LEVEL=info
       - HBOX_LOG_FORMAT=text
       - HBOX_WEB_MAX_UPLOAD_SIZE=10
+      - HBOX_OPTIONS_ALLOW_REGISTRATION=false
     volumes:
       - ${DATA_DIR}/homebox:/data/
     ports:
@@ -597,4 +598,4 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.homebox.tls.certresolver: prod
       traefik.http.routers.homebox.rule: Host(`${HOMEBOX_HOST}`)
-      traefik.http.routers.homebox.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.homebox.middlewares: hsts-header
