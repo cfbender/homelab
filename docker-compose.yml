@@ -70,7 +70,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - default
-    dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -88,7 +87,6 @@ services:
       TZ: ${TZ}
     volumes:
       - ${CONFIG_DIR}/esphome:/config
-    dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
       traefik.http.routers.esphome.tls.certresolver: prod
@@ -113,7 +111,6 @@ services:
       - ${CODE_DIR}:/home/code
     networks:
       - default
-    dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -138,7 +135,6 @@ services:
       HOSTNAME: ${COOKIE_DOMAIN}
     networks:
       - default
-    dns: ${SERVER_IP}
     labels:
       com.centurylinklabs.watchtower.enable: "false"
       traefik.enable: "true"
@@ -187,7 +183,6 @@ services:
       - 8090:8080
     networks:
       - default
-    dns: ${SERVER_IP}
 
   # https://github.com/thomseddon/traefik-forward-auth
   traefik-forward-auth:
@@ -205,7 +200,6 @@ services:
       - LIFETIME=604800 # 1 week
     networks:
       - default
-    dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -232,7 +226,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - default
-    dns: ${SERVER_IP}
 
   # https://github.com/portainer/portainer
   portainer:
@@ -245,7 +238,6 @@ services:
       - ${DATA_DIR}/portainer:/data
     networks:
       - default
-    dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -273,7 +265,6 @@ services:
       - 6789:6789 # optional
     networks:
       - default
-    dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -302,7 +293,6 @@ services:
       - bookstack_db
     networks:
       - default
-    dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -328,7 +318,6 @@ services:
       - ${DATA_DIR}/bookstack_db:/config
     networks:
       - default
-    dns: ${SERVER_IP}
 
   # https://hub.docker.com/r/tailscale/tailscale
   tailscale:
@@ -363,7 +352,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - default
-    dns: ${SERVER_IP}
 
   fail2ban:
     image: crazymax/fail2ban:latest
@@ -380,7 +368,6 @@ services:
       - ./traefik/log/access.log:/var/log/access.log:ro
       - ${CONFIG_DIR}/home/home-assistant.log:/var/log/home-assistant.log:ro
       - /var/log/auth.log:/var/log/auth.log:ro
-    dns: ${SERVER_IP}
 
   # https://github.com/benbusby/whoogle-search
   whoogle:
@@ -413,7 +400,6 @@ services:
       WHOOGLE_CONFIG_NEW_TAB: 0
     ports:
       - 5000:5000/tcp
-    dns: ${SERVER_IP}
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -445,7 +431,6 @@ services:
       NODE_ENV: production
     ports:
       - 8081:80/tcp
-    dns: ${SERVER_IP}
     volumes:
       - ${CONFIG_DIR}/dashy/dashy-conf.yml:/app/public/conf.yml
     healthcheck:
@@ -475,7 +460,6 @@ services:
         - EDISON_MECHMARKET_CHANNEL=${EDISON_MECHMARKET_CHANNEL}
         - EDISON_BOT_TOKEN=${EDISON_BOT_TOKEN}
     restart: unless-stopped
-    dns: ${SERVER_IP}
     labels:
       com.centurylinklabs.watchtower.enable: "false"
     environment:
@@ -493,7 +477,6 @@ services:
       TZ: ${TZ}
       LEMMY_DATABASE_URL: postgres://${LEMMY_DB_USER}:${LEMMY_DB_PASSWORD}@postgres:5432/${LEMMY_DB}
       LEMMY_CORS_ORIGIN: https://${LEMMY_HOST}
-    dns: ${SERVER_IP}
     depends_on:
       - lemmy-postgres
       - pictrs
@@ -621,3 +604,69 @@ services:
       traefik.http.routers.calibre.tls.certresolver: prod
       traefik.http.routers.calibre.rule: Host(`${CALIBRE_HOST}`)
       traefik.http.routers.calibre.middlewares: hsts-header, traefik-forward-auth
+
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: overseerr
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - "${CONFIG_DIR}/overseerr:/app/config"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.overseer.tls.certresolver: prod
+      traefik.http.routers.overseer.middlewares: hsts-header
+      traefik.http.routers.overseer.rule: Host(`request.${BASE_DOMAIN}`)
+      traefik.http.services.overseer.loadbalancer.server.port: 5055
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    environment:
+      PUID: "${PUID}"
+      PGID: "${PGID}"
+    volumes:
+      - ${MEDIA_DIR}:/data
+      - "${CONFIG_DIR}/sabnzbd:/config"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.sabnzbd.tls.certresolver: prod
+      traefik.http.routers.sabnzbd.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.sabnzbd.rule: Host(`nzb.${BASE_DOMAIN}`)
+      traefik.http.services.sabnzbd.loadbalancer.server.port: 8080
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    environment:
+      PUID: "${PUID}"
+      PGID: "${PGID}"
+    volumes:
+      - "${CONFIG_DIR}/radarr:/config"
+      - ${MEDIA_DIR}:/data
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.radarr.tls.certresolver: prod
+      traefik.http.routers.radarr.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.radarr.rule: Host(`radarr.${BASE_DOMAIN}`)
+      traefik.http.services.radarr.loadbalancer.server.port: 7878
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    environment:
+      PUID: "${PUID}"
+      PGID: "${PGID}"
+    volumes:
+      - "${CONFIG_DIR}/sonarr:/config"
+      - ${MEDIA_DIR}:/data
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.sonarr.tls.certresolver: prod
+      traefik.http.routers.sonarr.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.sonarr.rule: Host(`sonarr.${BASE_DOMAIN}`)
+      traefik.http.services.sonarr.loadbalancer.server.port: 8989
