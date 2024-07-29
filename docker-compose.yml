@@ -1,5 +1,3 @@
-version: "3.7"
-
 networks:
   default:
     name: "homelab_default"
@@ -16,6 +14,8 @@ services:
     image: traefik:latest
     container_name: traefik
     restart: unless-stopped
+    depends_on:
+      - authelia
     environment:
       TZ: "${TZ}"
       CF_API_EMAIL: "${CF_API_EMAIL}"
@@ -40,7 +40,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.traefik.tls.certresolver: prod
       traefik.http.routers.traefik.rule: Host(`${TRAEFIK_HOST}`)
-      traefik.http.routers.traefik.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.traefik.middlewares: authelia
       traefik.http.routers.traefik.service: api@internal
       traefik.http.middlewares.test-auth.basicauth.users: "${BASICAUTH_USERS}"
       traefik.http.middlewares.basicauth.basicauth.usersfile: /etc/traefik/.htpasswd
@@ -75,7 +75,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.netdata.tls.certresolver: prod
       traefik.http.routers.netdata.rule: Host(`${NETDATA_HOST}`)
-      traefik.http.routers.netdata.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.netdata.middlewares: hsts-header, authelia
 
   # https://github.com/esphome/esphome
   esphome:
@@ -91,7 +91,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.esphome.tls.certresolver: prod
       traefik.http.routers.esphome.rule: Host(`${ESPHOME_HOST}`)
-      traefik.http.routers.esphome.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.esphome.middlewares: hsts-header, authelia
       traefik.http.services.esphome.loadbalancer.server.port: 6052
       traefik.http.services.esphome.loadbalancer.server.scheme: http
 
@@ -116,7 +116,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.code.tls.certresolver: prod
       traefik.http.routers.code.rule: Host(`${CODE_HOST}`)
-      traefik.http.routers.code.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.code.middlewares: hsts-header, authelia
       traefik.http.services.code.loadbalancer.server.port: ${CODE_PORT}
       traefik.http.services.code.loadbalancer.server.scheme: http
 
@@ -144,7 +144,7 @@ services:
       traefik.http.routers.personal-site.middlewares: hsts-header
       traefik.http.routers.personal-site-dashboard.tls.certresolver: prod
       traefik.http.routers.personal-site-dashboard.rule: "(Host(`${PERSONAL_SITE_HOST}`) || Host(`${COOKIE_DOMAIN}`)) && PathPrefix(`${DASHBOARD_PATH}`)"
-      traefik.http.routers.personal-site-dashboard.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.personal-site-dashboard.middlewares: hsts-header, authelia
       traefik.http.services.personal-site.loadbalancer.server.port: ${WWW_PORT}
       traefik.http.services.personal-site.loadbalancer.server.scheme: http
 
@@ -185,30 +185,55 @@ services:
       - default
 
   # https://github.com/thomseddon/traefik-forward-auth
-  traefik-forward-auth:
-    image: thomseddon/traefik-forward-auth:2
-    container_name: traefik-forward-auth
+  # traefik-forward-auth:
+  #   image: thomseddon/traefik-forward-auth:2
+  #   container_name: traefik-forward-auth
+  #   restart: unless-stopped
+  #   environment:
+  #     - PROVIDERS_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+  #     - PROVIDERS_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+  #     - SECRET=${AUTH_SECRET}
+  #     - WHITELIST=${OAUTH_WHITELIST}
+  #     - LOG_LEVEL=debug
+  #     - AUTH_HOST=${AUTH_HOST}
+  #     - COOKIE_DOMAIN=${COOKIE_DOMAIN}
+  #     - LIFETIME=604800 # 1 week
+  #   networks:
+  #     - default
+  #   labels:
+  #     traefik.enable: "true"
+  #     traefik.docker.network: homelab_default
+  #     traefik.http.routers.traefik-forward-auth.tls.certresolver: prod
+  #     traefik.http.routers.traefik-forward-auth.rule: Host(`${AUTH_HOST}`)
+  #     traefik.http.routers.traefik-forward-auth.middlewares: traefik-forward-auth
+  #     traefik.http.middlewares.traefik-forward-auth.forwardauth.address: http://traefik-forward-auth:4181
+  #     traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders: X-Forwarded-User
+  #     traefik.http.services.traefik-forward-auth.loadbalancer.server.port: 4181
+
+  # https://github.com/authelia/authelia
+  authelia:
+    container_name: authelia
+    image: docker.io/authelia/authelia:latest
     restart: unless-stopped
-    environment:
-      - PROVIDERS_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - PROVIDERS_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - SECRET=${AUTH_SECRET}
-      - WHITELIST=${OAUTH_WHITELIST}
-      - LOG_LEVEL=debug
-      - AUTH_HOST=${AUTH_HOST}
-      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
-      - LIFETIME=604800 # 1 week
     networks:
-      - default
+      default:
+        aliases: []
+    expose:
+      - 9091
+    environment:
+      TZ: ${TZ}
+      AUTHELIA_JWT_SECRET: ${AUTHELIA_JWT_SECRET}
+    volumes:
+      - ${CONFIG_DIR}/authelia:/config
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
-      traefik.http.routers.traefik-forward-auth.tls.certresolver: prod
-      traefik.http.routers.traefik-forward-auth.rule: Host(`${AUTH_HOST}`)
-      traefik.http.routers.traefik-forward-auth.middlewares: traefik-forward-auth
-      traefik.http.middlewares.traefik-forward-auth.forwardauth.address: http://traefik-forward-auth:4181
-      traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders: X-Forwarded-User
-      traefik.http.services.traefik-forward-auth.loadbalancer.server.port: 4181
+      traefik.http.routers.authelia.tls.certresolver: prod
+      traefik.http.routers.authelia.rule: Host(`${AUTHELIA_HOST}`)
+      traefik.http.middlewares.authelia.forwardAuth.address: http://authelia:9091/api/authz/forward-auth
+      traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: "true"
+      traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: "Remote-User,Remote-Groups,Remote-Email,Remote-Name"
+      traefik.http.services.authelia.loadbalancer.server.port: 9091
 
   # https://github.com/containrrr/watchtower/
   watchtower:
@@ -408,7 +433,7 @@ services:
       traefik.http.routers.whoogle-opensearch.middlewares: hsts-header
       traefik.http.routers.whoogle.tls.certresolver: prod
       traefik.http.routers.whoogle.rule: Host(`${WHOOGLE_HOST}`)
-      traefik.http.routers.whoogle.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.whoogle.middlewares: hsts-header, authelia
       traefik.http.services.whoogle.loadbalancer.server.port: 5000
       traefik.http.services.whoogle.loadbalancer.server.scheme: http
 
@@ -444,7 +469,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.dashy.tls.certresolver: prod
       traefik.http.routers.dashy.rule: Host(`${DASHY_HOST}`)
-      traefik.http.routers.dashy.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.dashy.middlewares: hsts-header, authelia
       traefik.http.services.dashy.loadbalancer.server.port: 80
       traefik.http.services.dashy.loadbalancer.server.scheme: http
 
@@ -467,100 +492,6 @@ services:
       EDISON_MECHMARKET_QUERY: ${EDISON_MECHMARKET_QUERY}
       EDISON_MECHMARKET_CHANNEL: ${EDISON_MECHMARKET_CHANNEL}
       EDISON_BOT_TOKEN: ${EDISON_BOT_TOKEN}
-
-  #https://github.com/LemmyNet/lemmy
-  lemmy:
-    image: dessalines/lemmy
-    container_name: lemmy
-    restart: unless-stopped
-    environment:
-      TZ: ${TZ}
-      LEMMY_DATABASE_URL: postgres://${LEMMY_DB_USER}:${LEMMY_DB_PASSWORD}@postgres:5432/${LEMMY_DB}
-      LEMMY_CORS_ORIGIN: https://${LEMMY_HOST}
-    depends_on:
-      - lemmy-postgres
-      - pictrs
-    volumes:
-      - ${CONFIG_DIR}/lemmy/lemmy.hjson:/config/config.hjson:Z
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.lemmy.tls.certresolver: prod
-      traefik.http.routers.lemmy.rule: Host(`${LEMMY_HOST}`) && (Path(`/{path:(api|pictrs|feeds|nodeinfo|.well-known).*}`) || METHOD(`POST`) || HeadersRegexp(`Accept`, `^application/.*$$`))
-      traefik.http.routers.lemmy.middlewares: hsts-header
-      traefik.http.services.lemmy.loadbalancer.server.port: 8536
-      traefik.http.services.lemmy.loadbalancer.server.scheme: http
-
-  lemmy-ui:
-    image: dessalines/lemmy-ui
-    container_name: lemmy-ui
-    restart: unless-stopped
-    environment:
-      TZ: ${TZ}
-      # this needs to match the hostname defined in the lemmy service
-      LEMMY_UI_LEMMY_INTERNAL_HOST: lemmy:8536
-      # set the outside hostname here
-      LEMMY_UI_LEMMY_EXTERNAL_HOST: ${LEMMY_HOST}
-      LEMMY_HTTPS: "false"
-    depends_on:
-      - lemmy
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.lemmy-ui.tls.certresolver: prod
-      traefik.http.routers.lemmy-ui.rule: Host(`${LEMMY_HOST}`)
-      traefik.http.routers.lemmy-ui.middlewares: hsts-header
-      traefik.http.services.lemmy-ui.loadbalancer.server.port: 1234
-      traefik.http.services.lemmy-ui.loadbalancer.server.scheme: http
-
-  pictrs:
-    image: asonix/pictrs
-    # this needs to match the pictrs url in lemmy.hjson
-    hostname: pictrs
-    restart: unless-stopped
-    # we can set options to pictrs like this, here we set max. image size and forced format for conversion
-    # entrypoint: /sbin/tini -- /usr/local/bin/pict-rs -p /mnt -m 4 --image-format webp
-    environment:
-      - PICTRS__API_KEY=${PICTRS_API_KEY}
-      - PICTRS__MEDIA__VIDEO_CODEC=vp9
-      - PICTRS__MEDIA__GIF__MAX_WIDTH=256
-      - PICTRS__MEDIA__GIF__MAX_HEIGHT=256
-      - PICTRS__MEDIA__GIF__MAX_AREA=65536
-      - PICTRS__MEDIA__GIF__MAX_FRAME_COUNT=400
-    user: 991:991
-    volumes:
-      - ${DATA_DIR}/pictrs:/mnt:Z
-
-  lemmy-postgres:
-    image: postgres:15-alpine
-    # this needs to match the database host in lemmy.hson
-    # Tune your settings via
-    # https://pgtune.leopard.in.ua/#/
-    # You can use this technique to add them here
-    # https://stackoverflow.com/a/30850095/1655478
-    restart: unless-stopped
-    hostname: postgres
-    command:
-      [
-        "postgres",
-        "-c",
-        "session_preload_libraries=auto_explain",
-        "-c",
-        "auto_explain.log_min_duration=5ms",
-        "-c",
-        "auto_explain.log_analyze=true",
-        "-c",
-        "track_activity_query_size=1048576",
-      ]
-    ports:
-      # use a different port so it doesnt conflict with potential postgres db running on the host
-      - 5433:5432
-    environment:
-      POSTGRES_USER: ${LEMMY_DB_USER}
-      POSTGRES_PASSWORD: ${LEMMY_DB_PASSWORD}
-      POSTGRES_DB: ${LEMMY_DB}
-    volumes:
-      - ${DATA_DIR}/postgres:/var/lib/postgresql/data:Z
 
   # https://github.com/hay-kot/homebox
   homebox:
@@ -603,7 +534,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.calibre.tls.certresolver: prod
       traefik.http.routers.calibre.rule: Host(`${CALIBRE_HOST}`)
-      traefik.http.routers.calibre.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.calibre.middlewares: hsts-header, authelia
 
   overseerr:
     image: sctx/overseerr:latest
@@ -633,7 +564,7 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.sabnzbd.tls.certresolver: prod
-      traefik.http.routers.sabnzbd.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.sabnzbd.middlewares: hsts-header, authelia
       traefik.http.routers.sabnzbd.rule: Host(`nzb.${BASE_DOMAIN}`)
       traefik.http.services.sabnzbd.loadbalancer.server.port: 8080
 
@@ -650,7 +581,7 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.radarr.tls.certresolver: prod
-      traefik.http.routers.radarr.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.radarr.middlewares: hsts-header, authelia
       traefik.http.routers.radarr.rule: Host(`radarr.${BASE_DOMAIN}`)
       traefik.http.services.radarr.loadbalancer.server.port: 7878
 
@@ -667,6 +598,6 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.sonarr.tls.certresolver: prod
-      traefik.http.routers.sonarr.middlewares: hsts-header, traefik-forward-auth
+      traefik.http.routers.sonarr.middlewares: hsts-header, authelia
       traefik.http.routers.sonarr.rule: Host(`sonarr.${BASE_DOMAIN}`)
       traefik.http.services.sonarr.loadbalancer.server.port: 8989
