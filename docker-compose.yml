@@ -184,32 +184,6 @@ services:
     networks:
       - default
 
-  # https://github.com/thomseddon/traefik-forward-auth
-  # traefik-forward-auth:
-  #   image: thomseddon/traefik-forward-auth:2
-  #   container_name: traefik-forward-auth
-  #   restart: unless-stopped
-  #   environment:
-  #     - PROVIDERS_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-  #     - PROVIDERS_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-  #     - SECRET=${AUTH_SECRET}
-  #     - WHITELIST=${OAUTH_WHITELIST}
-  #     - LOG_LEVEL=debug
-  #     - AUTH_HOST=${AUTH_HOST}
-  #     - COOKIE_DOMAIN=${COOKIE_DOMAIN}
-  #     - LIFETIME=604800 # 1 week
-  #   networks:
-  #     - default
-  #   labels:
-  #     traefik.enable: "true"
-  #     traefik.docker.network: homelab_default
-  #     traefik.http.routers.traefik-forward-auth.tls.certresolver: prod
-  #     traefik.http.routers.traefik-forward-auth.rule: Host(`${AUTH_HOST}`)
-  #     traefik.http.routers.traefik-forward-auth.middlewares: traefik-forward-auth
-  #     traefik.http.middlewares.traefik-forward-auth.forwardauth.address: http://traefik-forward-auth:4181
-  #     traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders: X-Forwarded-User
-  #     traefik.http.services.traefik-forward-auth.loadbalancer.server.port: 4181
-
   # https://github.com/authelia/authelia
   authelia:
     container_name: authelia
@@ -271,33 +245,6 @@ services:
       traefik.http.routers.portainer.middlewares: hsts-header
       traefik.http.services.portainer.loadbalancer.server.port: 9000
       traefik.http.services.portainer.loadbalancer.server.scheme: http
-
-  # https://github.com/linuxserver/docker-unifi-controller
-  unifi:
-    image: lscr.io/linuxserver/unifi-controller
-    container_name: unifi
-    restart: unless-stopped
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-    volumes:
-      - ${CONFIG_DIR}/unifi:/config
-    ports:
-      - 3478:3478/udp
-      - 10001:10001/udp
-      - 8080:8080
-      - 8443:8443
-      - 6789:6789 # optional
-    networks:
-      - default
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.unifi.tls.certresolver: prod
-      traefik.http.routers.unifi.rule: Host(`${UNIFI_HOST}`)
-      traefik.http.routers.unifi.middlewares: hsts-header
-      traefik.http.services.unifi.loadbalancer.server.port: 8443
-      traefik.http.services.unifi.loadbalancer.server.scheme: https
 
   # https://github.com/BookStackApp/BookStack
   bookstack:
@@ -394,49 +341,6 @@ services:
       - ${CONFIG_DIR}/home/home-assistant.log:/var/log/home-assistant.log:ro
       - /var/log/auth.log:/var/log/auth.log:ro
 
-  # https://github.com/benbusby/whoogle-search
-  whoogle:
-    image: benbusby/whoogle-search
-    container_name: whoogle
-    restart: unless-stopped
-    pids_limit: 50
-    mem_limit: 256mb
-    memswap_limit: 256mb
-    # user debian-tor from tor package
-    user: whoogle
-    security_opt:
-      - no-new-privileges
-    cap_drop:
-      - ALL
-    tmpfs:
-      - /config/:size=10M,uid=927,gid=927,mode=1700
-      - /var/lib/tor/:size=15M,uid=927,gid=927,mode=1700
-      - /run/tor/:size=1M,uid=927,gid=927,mode=1700
-    environment:
-      TZ: ${TZ}
-      WHOOGLE_CONFIG_THEME: system
-      WHOOGLE_CONFIG_PREFERENCES_ENCRYPTED: 1
-      WHOOGLE_CONFIG_PREFERENCES_KEY: ${WHOOGLE_PREFERENCES_KEY}
-      WHOOGLE_CONFIG_COUNTRY: US
-      WHOOGLE_CONFIG_SEARCH_LANGUAGE: lang_en
-      WHOOGLE_CONFIG_GET_ONLY: 1
-      WHOOGLE_CONFIG_DISABLE: 0
-      WHOOGLE_CONFIG_VIEW_IMAGE: 1
-      WHOOGLE_CONFIG_NEW_TAB: 0
-    ports:
-      - 5000:5000/tcp
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.whoogle-opensearch.tls.certresolver: prod
-      traefik.http.routers.whoogle-opensearch.rule: "(Host(`${WHOOGLE_HOST}`) && Path(`/opensearch.xml`))"
-      traefik.http.routers.whoogle-opensearch.middlewares: hsts-header
-      traefik.http.routers.whoogle.tls.certresolver: prod
-      traefik.http.routers.whoogle.rule: Host(`${WHOOGLE_HOST}`)
-      traefik.http.routers.whoogle.middlewares: hsts-header, authelia
-      traefik.http.services.whoogle.loadbalancer.server.port: 5000
-      traefik.http.services.whoogle.loadbalancer.server.scheme: http
-
   #https://github.com/Lissy93/dashy
   dashy:
     image: lissy93/dashy:latest
@@ -444,15 +348,6 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
-      WHOOGLE_CONFIG_THEME: system
-      WHOOGLE_CONFIG_PREFERENCES_ENCRYPTED: 1
-      WHOOGLE_CONFIG_PREFERENCES_KEY: ${WHOOGLE_PREFERENCES_KEY}
-      WHOOGLE_CONFIG_COUNTRY: US
-      WHOOGLE_CONFIG_SEARCH_LANGUAGE: lang_en
-      WHOOGLE_CONFIG_GET_ONLY: 1
-      WHOOGLE_CONFIG_DISABLE: 0
-      WHOOGLE_CONFIG_VIEW_IMAGE: 1
-      WHOOGLE_CONFIG_NEW_TAB: 0
       NODE_ENV: production
     ports:
       - 8081:80/tcp
@@ -601,3 +496,19 @@ services:
       traefik.http.routers.sonarr.middlewares: hsts-header, authelia
       traefik.http.routers.sonarr.rule: Host(`sonarr.${BASE_DOMAIN}`)
       traefik.http.services.sonarr.loadbalancer.server.port: 8989
+
+  gotify:
+    image: gotify/server
+    container_name: gotify
+    restart: unless-stopped
+    environment:
+      GOTIFY_DEFAULTUSER_PASS: ${GOTIFY_PASSWORD}
+      TZ: ${TZ}
+    volumes:
+      - ${DATA_DIR}/gotify:/app/data
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.gotify.tls.certresolver: prod
+      traefik.http.routers.gotify.middlewares: hsts-header
+      traefik.http.routers.gotify.rule: Host(`gotify.${BASE_DOMAIN}`)
+      traefik.http.services.gotify.loadbalancer.server.port: 80
