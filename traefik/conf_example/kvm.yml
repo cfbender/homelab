@@ -1,0 +1,18 @@
+http:
+  routers:
+    kvm:
+      rule: "Host(`<KVM HOST>`)"
+      service: kvm
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: prod
+      middlewares:
+        - secure-headers@file
+
+  services:
+    kvm:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "<KVM URL>"

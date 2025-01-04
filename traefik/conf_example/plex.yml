@@ -1,0 +1,19 @@
+http:
+  routers:
+    plex:
+      rule: "Host(`<PLEX HOST>`)"
+      service: plex
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: prod
+      middlewares:
+        - secure-headers@file
+        - authelia@docker
+
+  services:
+    plex:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "<PLEX URL>"
