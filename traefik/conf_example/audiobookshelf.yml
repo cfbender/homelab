@@ -1,0 +1,18 @@
+http:
+  routers:
+    audiobookshelf:
+      rule: "Host(`<AUDIOBOOKSHELF_HOST`)"
+      service: audiobookshelf
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: prod
+      middlewares:
+        - secure-headers@file
+
+  services:
+    audiobookshelf:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "<AUDIOBOOKSHELF_URL>"
