@@ -512,3 +512,15 @@ services:
       traefik.http.routers.gotify.middlewares: hsts-header
       traefik.http.routers.gotify.rule: Host(`gotify.${BASE_DOMAIN}`)
       traefik.http.services.gotify.loadbalancer.server.port: 80
+  tools:
+    image: corentinth/it-tools:latest
+    container_name: tools
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.tools.tls.certresolver: prod
+      traefik.http.routers.tools.middlewares: hsts-header
+      traefik.http.routers.tools.rule: Host(`tools.${BASE_DOMAIN}`)
+      traefik.http.services.tools.loadbalancer.server.port: 80
