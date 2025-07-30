@@ -524,3 +524,20 @@ services:
       traefik.http.routers.tools.middlewares: hsts-header
       traefik.http.routers.tools.rule: Host(`tools.${BASE_DOMAIN}`)
       traefik.http.services.tools.loadbalancer.server.port: 80
+  copyparty:
+    image: copyparty/ac:latest
+    container_name: copyparty
+    restart: unless-stopped
+    environment:
+      PUID: "${PUID}"
+      PGID: "${PGID}"
+    volumes:
+      - "${CONFIG_DIR}/copyparty:/cfg"
+      - ${DATA_DIR}/copyparty:/data
+      - ${FILES_DIR}:/w
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.copyparty.tls.certresolver: prod
+      traefik.http.routers.copyparty.middlewares: hsts-header, authelia
+      traefik.http.routers.copyparty.rule: Host(`${COPYPARTY_HOST}`)
+      traefik.http.services.copyparty.loadbalancer.server.port: 3923
