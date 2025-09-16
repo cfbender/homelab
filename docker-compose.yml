@@ -196,7 +196,6 @@ services:
       - 9091
     environment:
       TZ: ${TZ}
-      AUTHELIA_JWT_SECRET: ${AUTHELIA_JWT_SECRET}
     volumes:
       - ${CONFIG_DIR}/authelia:/config
     labels:
