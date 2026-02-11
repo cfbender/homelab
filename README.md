@@ -14,28 +14,34 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 
 ## Containers
 
-- [Netdata](https://www.netdata.cloud/) - Troubleshoot slowdowns and anomalies in your infrastructure with thousands of metrics, interactive visualizations, and insightful health alarms.
 - [Traefik](https://traefik.io/) - modern HTTP reverse proxy and load balancer that makes deploying microservices easy.
+- [Netdata](https://www.netdata.cloud/) - Troubleshoot slowdowns and anomalies in your infrastructure with thousands of metrics, interactive visualizations, and insightful health alarms.
 - [ESPHome](https://esphome.io/) - system to control your ESP8266/ESP32 by simple yet powerful configuration files and control them remotely through Home Automation systems.
 - [code-server](https://github.com/cdr/code-server) - Run VS Code on any machine anywhere and access it in the browser.
 - [personal-site](https://github.com/cfbender/personal-site) - my personal site, built with Phoenix LiveView.
-- [AdGuard Home](https://adguard.com/en/adguard-home/overview.html) - network-wide software for blocking ads & tracking.
-- [Watchtower](https://containrrr.dev/watchtower/) - container-based solution for automating Docker container base image updates.
+- [AdGuard Home](https://com/en/adguard-home/overview.html) - network-wide software for blocking ads & tracking.
+- [adguardhome-sync](https://github.com/bakito/adguardhome-sync)- Synchronize AdGuardHome config to a replica instance. *
+- [Authelia](https://www.authelia.com/) - The Single Sign-On Multi-Factor portal for web apps.
+- [Watchtower](https://containrrr.dev/watchtower/) - container-based solution for automating Docker container base image updates. *
 - [Portainer CE](https://www.portainer.io/) - lightweight ‘universal’ management GUI that can be used to easily manage Docker, Swarm, Kubernetes and ACI environments.
-- [Unifi controller](https://docs.linuxserver.io/images/docker-unifi-controller) - powerful, enterprise wireless software engine ideal for high-density client deployments requiring low latency and high uptime performance.
-- [Bookstack](https://www.bookstackapp.com/) - simple, self-hosted, easy-to-use platform for organising and storing information.
-- [Wireguard](https://www.wireguard.com/) - extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography.
-- [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) - scans log files and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. \*
-- [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. \*
-- [adguardhome-sync](https://github.com/bakito/adguardhome-sync)- Synchronize AdGuardHome config to a replica instance. \*
+- [Tailscale](https://tailscale.com/) - Zero config VPN. *
+- [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. *
+- [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) - scans log files and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. *
 - [dashy](https://github.com/Lissy93/dashy) - 🚀 A self-hostable personal dashboard built for you. Includes status-checking, widgets, themes, icon packs, a UI editor and tons more!
-- [whoogle](https://github.com/benbusby/whoogle-search) - A self-hosted, ad-free, privacy-respecting metasearch engine
-- [edison](https://github.com/cfbender/edison) - a little discord bot I run for some random tasks \*
-- [lemmy](https://github.com/LemmyNet/lemmy-ui) - The official web app for lemmy \*\*
+- [edison](https://github.com/cfbender/edison) - a little discord bot I run for some random tasks *
+- [Homebox](https://github.com/hay-kot/homebox) - An inventory and organization system for your home.
+- [Booklore](https://github.com/booklore-app/booklore) - A self-hosted eBook library manager and reader.
+- [MariaDB](https://mariadb.org/) - A popular open source database server. *
+- [Overseerr](https://overseerr.dev/) - A request management and media discovery tool for your home media server.
+- [NZBGet](https://nzbget.net/) - A popular usenet downloader.
+- [Radarr](https://radarr.video/) - A movie collection manager for Usenet and BitTorrent users.
+- [Sonarr](https://sonarr.tv/) - A PVR for Usenet and BitTorrent users.
+- [Gotify](https://gotify.net/) - A simple server for sending and receiving messages.
+- [IT-Tools](https://it-tools.tech/) - A collection of useful tools for developers.
+- [Copyparty](https://github.com/copyparty/copyparty) - A file sharing server.
+- [ClipCascade](https://github.com/sathvikrao/clipcascade) - A self-hosted clipboard manager.
 
-\*not exposed
-
-\*\* including the lemmy, lemmy-ui, postgres and pictrs containers
+*not exposed
 
 ## Requirements
 

@@ -351,7 +351,7 @@ services:
       - HBOX_LOG_LEVEL=info
       - HBOX_LOG_FORMAT=text
       - HBOX_WEB_MAX_UPLOAD_SIZE=10
-      - HBOX_OPTIONS_ALLOW_REGISTRATION=false
+      - HBOX_OPTIONS_ALLOW_REGISTRATION=true
     volumes:
       - ${DATA_DIR}/homebox:/data/
     ports:
@@ -363,27 +363,62 @@ services:
       traefik.http.routers.homebox.rule: Host(`${HOMEBOX_HOST}`)
       traefik.http.routers.homebox.middlewares: hsts-header
 
-  # https://github.com/janeczku/calibre-web
-  calibre-web:
-    image: linuxserver/calibre-web:latest
-    container_name: calibre-web
+  # https://github.com/booklore-app/booklore
+  booklore:
+    image: booklore/booklore:latest
+    container_name: booklore
     restart: unless-stopped
     environment:
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
-      DOCKER_MODS: linuxserver/mods:universal-calibre
+      DATABASE_URL: ${BOOKLORE_DATABASE_URL}
+      DATABASE_USERNAME: ${BOOKLORE_DB_USER}
+      DATABASE_PASSWORD: ${BOOKLORE_DB_PASSWORD}
+      BOOKLORE_PORT: ${BOOKLORE_PORT}
     volumes:
-      - ${DATA_DIR}/books:/books
-      - ${CONFIG_DIR}/config:/config
+      - ${BOOKS_DIR}:/books
+      - ${DATA_DIR}/books:/calibre_books
+      - ${BOOKDROP_DIR}:/bookdrop
+      - ${DATA_DIR}/boolkore:/app/data
+    depends_on:
+      mariadb:
+        condition: service_healthy
     ports:
-      - 8083:8083/tcp
+      - "${BOOKLORE_PORT}:${BOOKLORE_PORT}"
+    healthcheck:
+      test: wget -q -O - http://localhost:${BOOKLORE_PORT}/api/v1/healthcheck
+      interval: 60s
+      retries: 5
+      start_period: 60s
+      timeout: 10s
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
-      traefik.http.routers.calibre.tls.certresolver: prod
-      traefik.http.routers.calibre.rule: Host(`${CALIBRE_HOST}`)
-      traefik.http.routers.calibre.middlewares: hsts-header, authelia
+      traefik.http.routers.booklore.tls.certresolver: prod
+      traefik.http.routers.booklore.rule: Host(`${BOOKS_HOST}`)
+      traefik.http.routers.booklore.middlewares: hsts-header, authelia
+      traefik.http.services.booklore.loadbalancer.server.port: ${BOOKLORE_PORT}
+
+  mariadb:
+    image: lscr.io/linuxserver/mariadb:11.4.5
+    container_name: mariadb
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${BOOKLORE_DB_USER}
+      - MYSQL_PASSWORD=${BOOKLORE_DB_PASSWORD}
+    volumes:
+      - ${DATA_DIR}/mariadb/config:/config
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   overseerr:
     image: sctx/overseerr:latest
@@ -400,22 +435,26 @@ services:
       traefik.http.routers.overseer.rule: Host(`request.${BASE_DOMAIN}`)
       traefik.http.services.overseer.loadbalancer.server.port: 5055
 
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
-    container_name: sabnzbd
-    restart: unless-stopped
+  nzbget:
+    image: lscr.io/linuxserver/nzbget:latest
+    container_name: nzbget
     environment:
       PUID: "${PUID}"
       PGID: "${PGID}"
+      TZ: "${TZ}"
     volumes:
-      - ${MEDIA_DIR}:/data
+      - ${MEDIA_DIR}/usenet:/downloads
       - "${CONFIG_DIR}/sabnzbd:/config"
+    ports:
+      - 6789:6789
+    restart: unless-stopped
     labels:
       traefik.enable: "true"
-      traefik.http.routers.sabnzbd.tls.certresolver: prod
-      traefik.http.routers.sabnzbd.middlewares: hsts-header, authelia
-      traefik.http.routers.sabnzbd.rule: Host(`nzb.${BASE_DOMAIN}`)
-      traefik.http.services.sabnzbd.loadbalancer.server.port: 8080
+      traefik.http.routers.nzbget.tls.certresolver: prod
+      traefik.http.routers.nzbget.middlewares: hsts-header
+      traefik.http.routers.nzbget.rule: Host(`nzb.${BASE_DOMAIN}`)
+      traefik.http.services.nzbget.loadbalancer.server.port: 6789
+
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -466,6 +505,7 @@ services:
       traefik.http.routers.gotify.middlewares: hsts-header
       traefik.http.routers.gotify.rule: Host(`gotify.${BASE_DOMAIN}`)
       traefik.http.services.gotify.loadbalancer.server.port: 80
+
   tools:
     image: corentinth/it-tools:latest
     container_name: tools
@@ -478,6 +518,7 @@ services:
       traefik.http.routers.tools.middlewares: hsts-header
       traefik.http.routers.tools.rule: Host(`tools.${BASE_DOMAIN}`)
       traefik.http.services.tools.loadbalancer.server.port: 80
+
   copyparty:
     image: copyparty/ac:latest
     container_name: copyparty
@@ -495,3 +536,21 @@ services:
       traefik.http.routers.copyparty.middlewares: hsts-header, authelia
       traefik.http.routers.copyparty.rule: Host(`${COPYPARTY_HOST}`)
       traefik.http.services.copyparty.loadbalancer.server.port: 3923
+
+  clipcascade:
+    image: sathvikrao/clipcascade:latest
+    container_name: clipcascade
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/cc_users:/database  # Persistent storage for user data
+    environment:
+      - CC_MAX_MESSAGE_SIZE_IN_MiB=10   # Maximum message size in MiB (ignored if P2P mode is enabled)
+      - CC_P2P_ENABLED=false  # Enables or disables peer-to-peer(P2P) mode
+      - CC_ALLOWED_ORIGINS=https://clip.cfb.dev # Defines allowed CORS origins for security
+      # - CC_SIGNUP_ENABLED=false  # Enables or disables user self-registration
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.clipcascade.tls.certresolver: prod
+      traefik.http.routers.clipcascade.middlewares: hsts-header
+      traefik.http.routers.clipcascade.rule: Host(`${CLIPCASCADE_HOST}`)
+      traefik.http.services.clipcascade.loadbalancer.server.port: 8080
