@@ -42,40 +42,9 @@ services:
       traefik.http.routers.traefik.rule: Host(`${TRAEFIK_HOST}`)
       traefik.http.routers.traefik.middlewares: authelia
       traefik.http.routers.traefik.service: api@internal
-      traefik.http.middlewares.test-auth.basicauth.users: "${BASICAUTH_USERS}"
-      traefik.http.middlewares.basicauth.basicauth.usersfile: /etc/traefik/.htpasswd
-      traefik.http.middlewares.ipallowlist.ipwhitelist.sourcerange: "${IPALLOWLIST}"
       traefik.http.middlewares.hsts-header.headers.customResponseHeaders.Strict-Transport-Security: "max-age=63072000"
     extra_hosts:
       - host.docker.internal:172.17.0.1
-
-  # https://hub.docker.com/r/netdata/netdata
-  netdata:
-    image: netdata/netdata
-    container_name: netdata
-    restart: unless-stopped
-    hostname: ${NETDATA_HOST}
-    environment:
-      PGID: ${DOCKER_PGID}
-      TZ: ${TZ}
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - default
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.netdata.tls.certresolver: prod
-      traefik.http.routers.netdata.rule: Host(`${NETDATA_HOST}`)
-      traefik.http.routers.netdata.middlewares: hsts-header, authelia
 
   # https://github.com/esphome/esphome
   esphome:
@@ -136,7 +105,6 @@ services:
     networks:
       - default
     labels:
-      com.centurylinklabs.watchtower.enable: "false"
       traefik.enable: "true"
       traefik.docker.network: homelab_default
       traefik.http.routers.personal-site.tls.certresolver: prod
@@ -208,60 +176,6 @@ services:
       traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: "Remote-User,Remote-Groups,Remote-Email,Remote-Name"
       traefik.http.services.authelia.loadbalancer.server.port: 9091
 
-  # https://github.com/containrrr/watchtower/
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: unless-stopped
-    environment:
-      TZ: ${TZ}
-      WATCHTOWER_NOTIFICATIONS: "shoutrrr"
-      WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_WARN_ON_HEAD_FAILURE: "never"
-    command: --schedule "0 0 20 * * *" # runs daily at 8 PM
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - default
-
-  # https://github.com/portainer/portainer
-  portainer:
-    image: portainer/portainer-ce
-    container_name: portainer
-    restart: unless-stopped
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${DATA_DIR}/portainer:/data
-    networks:
-      - default
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.portainer.tls.certresolver: prod
-      traefik.http.routers.portainer.rule: Host(`${PORTAINER_HOST}`)
-      traefik.http.routers.portainer.middlewares: hsts-header
-      traefik.http.services.portainer.loadbalancer.server.port: 9000
-      traefik.http.services.portainer.loadbalancer.server.scheme: http
-
-  # https://hub.docker.com/r/tailscale/tailscale
-  tailscale:
-    image: tailscale/tailscale:latest
-    container_name: tailscale
-    restart: unless-stopped
-    network_mode: host
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    environment:
-      TZ: ${TZ}
-      TS_AUTHKEY: ${TAILSCALE_AUTH_KEY}
-      TS_ROUTES: ${TAILSCALE_ADVERTISED_ROUTES}
-    volumes:
-      - /var/lib:/var/lib
-      - /dev/net/tun:/dev/net/tun
-
   mosquitto:
     image: eclipse-mosquitto
     container_name: mosquitto
@@ -278,22 +192,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - default
-
-  fail2ban:
-    image: crazymax/fail2ban:latest
-    container_name: fail2ban
-    restart: unless-stopped
-    network_mode: host
-    environment:
-      TZ: ${TZ}
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    volumes:
-      - ./fail2ban:/data
-      - ./traefik/log/access.log:/var/log/access.log:ro
-      - ${CONFIG_DIR}/home/home-assistant.log:/var/log/home-assistant.log:ro
-      - /var/log/auth.log:/var/log/auth.log:ro
 
   #https://github.com/Lissy93/dashy
   dashy:
@@ -334,8 +232,6 @@ services:
         - EDISON_MECHMARKET_CHANNEL=${EDISON_MECHMARKET_CHANNEL}
         - EDISON_BOT_TOKEN=${EDISON_BOT_TOKEN}
     restart: unless-stopped
-    labels:
-      com.centurylinklabs.watchtower.enable: "false"
     environment:
       EDISON_MECHMARKET_ROLE_ID: ${EDISON_MECHMARKET_ROLE_ID}
       EDISON_MECHMARKET_QUERY: ${EDISON_MECHMARKET_QUERY}
@@ -498,22 +394,6 @@ services:
       traefik.http.routers.sonarr.middlewares: hsts-header, authelia
       traefik.http.routers.sonarr.rule: Host(`sonarr.${BASE_DOMAIN}`)
       traefik.http.services.sonarr.loadbalancer.server.port: 8989
-
-  gotify:
-    image: gotify/server
-    container_name: gotify
-    restart: unless-stopped
-    environment:
-      GOTIFY_DEFAULTUSER_PASS: ${GOTIFY_PASSWORD}
-      TZ: ${TZ}
-    volumes:
-      - ${DATA_DIR}/gotify:/app/data
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.gotify.tls.certresolver: prod
-      traefik.http.routers.gotify.middlewares: hsts-header
-      traefik.http.routers.gotify.rule: Host(`gotify.${BASE_DOMAIN}`)
-      traefik.http.services.gotify.loadbalancer.server.port: 80
 
   tools:
     image: corentinth/it-tools:latest
