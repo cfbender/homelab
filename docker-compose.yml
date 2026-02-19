@@ -397,7 +397,7 @@ services:
       traefik.docker.network: homelab_default
       traefik.http.routers.booklore.tls.certresolver: prod
       traefik.http.routers.booklore.rule: Host(`${BOOKS_HOST}`)
-      traefik.http.routers.booklore.middlewares: hsts-header, authelia
+      traefik.http.routers.booklore.middlewares: hsts-header
       traefik.http.services.booklore.loadbalancer.server.port: ${BOOKLORE_PORT}
 
   mariadb:
@@ -420,14 +420,23 @@ services:
       timeout: 5s
       retries: 10
 
-  overseerr:
-    image: sctx/overseerr:latest
-    container_name: overseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
     restart: unless-stopped
-    security_opt:
-      - seccomp:unconfined
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
       - "${CONFIG_DIR}/overseerr:/app/config"
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
     labels:
       traefik.enable: "true"
       traefik.http.routers.overseer.tls.certresolver: prod
@@ -554,3 +563,20 @@ services:
       traefik.http.routers.clipcascade.middlewares: hsts-header
       traefik.http.routers.clipcascade.rule: Host(`${CLIPCASCADE_HOST}`)
       traefik.http.services.clipcascade.loadbalancer.server.port: 8080
+
+  #https://github.com/cporcellijr/abs-kosync-bridge
+  abs-kosync:
+    image: ghcr.io/cporcellijr/abs-kosync-bridge:latest
+    container_name: abs-kosync
+    restart: unless-stopped
+    ports:
+      - "8080:5757"
+    environment:
+      TZ: ${TZ}
+      ABS_SERVER: ${ABS_SERVER}
+      ABS_KEY: ${ABS_KEY}
+    volumes:
+      - ${DATA_DIR}/abs_kosync:/data
+      - ${BOOKS_DIR}:/books
+    networks:
+      - default
