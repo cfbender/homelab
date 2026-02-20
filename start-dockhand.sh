@@ -13,7 +13,6 @@ docker run -d \
   --restart unless-stopped \
   --network homelab_default \
   --group-add 1001 \
-  -p 3000:3000 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "${DATA_DIR}/dockhand:/app/data" \
   -v ./:/homelab \

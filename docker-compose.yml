@@ -164,6 +164,7 @@ services:
       - 9091
     environment:
       TZ: ${TZ}
+      AUTHELIA_SESSION_SECRET: ${AUTHELIA_SESSION_SECRET}
     volumes:
       - ${CONFIG_DIR}/authelia:/config
     labels:
@@ -202,7 +203,7 @@ services:
       TZ: ${TZ}
       NODE_ENV: production
     ports:
-      - 8081:80/tcp
+      - 8081:8080/tcp
     volumes:
       - ${CONFIG_DIR}/dashy/dashy-conf.yml:/app/public/conf.yml
     healthcheck:
@@ -217,7 +218,7 @@ services:
       traefik.http.routers.dashy.tls.certresolver: prod
       traefik.http.routers.dashy.rule: Host(`${DASHY_HOST}`)
       traefik.http.routers.dashy.middlewares: hsts-header, authelia
-      traefik.http.services.dashy.loadbalancer.server.port: 80
+      traefik.http.services.dashy.loadbalancer.server.port: 8080
       traefik.http.services.dashy.loadbalancer.server.scheme: http
 
   #https://github.com/cfbender/edison
@@ -460,3 +461,16 @@ services:
       - ${BOOKS_DIR}:/books
     networks:
       - default
+      
+  convert:
+    image: ghcr.io/p2r3/convert:latest
+    container_name: convert
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.convert.tls.certresolver: prod
+      traefik.http.routers.convert.middlewares: hsts-header
+      traefik.http.routers.convert.rule: Host(`${CONVERT_HOST}`)
+      traefik.http.services.convert.loadbalancer.server.port: 80
