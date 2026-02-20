@@ -36,6 +36,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Copyparty](https://github.com/copyparty/copyparty) - A file sharing server.
 - [ClipCascade](https://github.com/sathvikrao/clipcascade) - A self-hosted clipboard manager.
 - [abs-kosync](https://github.com/cporcellijr/abs-kosync-bridge) - A bridge between Audiobookshelf and KOReader. *
+- [convert](https://github.com/p2r3/convert) - Truly universal online file converter
 
 *not exposed
 
@@ -48,6 +49,8 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 ## Configuration (exposed to internet)
 
 Copy `env.sample` to `.env` and populate all fields in the `COMMON` and `EXTERNAL` sections.
+
+Since switching to dockhand, I have started storing secrets in there, so there may be some missing in the .env file. Open the stack in dockhand, and fill in the required missing variables.
 
 Copy `traefik/traefik.yml.sample` to `traefik/traefik.yml` and fill in the `ACME_EMAIL` and `PILOT_TOKEN` variables (the pilot token is an optional property for Traefik Pilot, feel free to remove the section all-together).
 
