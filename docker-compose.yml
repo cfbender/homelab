@@ -437,7 +437,7 @@ services:
       - CC_MAX_MESSAGE_SIZE_IN_MiB=10   # Maximum message size in MiB (ignored if P2P mode is enabled)
       - CC_P2P_ENABLED=false  # Enables or disables peer-to-peer(P2P) mode
       - CC_ALLOWED_ORIGINS=https://clip.cfb.dev # Defines allowed CORS origins for security
-      # - CC_SIGNUP_ENABLED=false  # Enables or disables user self-registration
+      - CC_SIGNUP_ENABLED=false  # Enables or disables user self-registration
     labels:
       traefik.enable: "true"
       traefik.http.routers.clipcascade.tls.certresolver: prod
@@ -450,17 +450,29 @@ services:
     image: ghcr.io/cporcellijr/abs-kosync-bridge:latest
     container_name: abs-kosync
     restart: unless-stopped
-    ports:
-      - "8080:5757"
+    depends_on:
+      - booklore
     environment:
       TZ: ${TZ}
       ABS_SERVER: ${ABS_SERVER}
       ABS_KEY: ${ABS_KEY}
+      KOSYNC_SERVER: "https://${BOOKS_HOST}/api/koreader"
+      KOSYNC_USER: ${KOSYNC_USER}
+      KOSYNC_KEY: ${KOSYNC_KEY}
     volumes:
       - ${DATA_DIR}/abs_kosync:/data
       - ${BOOKS_DIR}:/books
     networks:
       - default
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.kosync.tls.certresolver: prod
+      traefik.http.routers.kosync.middlewares: hsts-header, authelia
+      traefik.http.routers.kosync.rule: "Host(`${KOSYNC_HOST}`)"
+      traefik.http.routers.kosyncnoauth.tls.certresolver: prod
+      traefik.http.routers.kosyncnoauth.middlewares: hsts-header
+      traefik.http.routers.kosyncnoauth.rule: "Host(`${KOSYNC_HOST}`) && PathPrefix(`/sync`)"
+      traefik.http.services.kosync.loadbalancer.server.port: 5757
       
   convert:
     image: ghcr.io/p2r3/convert:latest
