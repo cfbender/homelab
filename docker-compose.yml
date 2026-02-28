@@ -277,7 +277,7 @@ services:
       - ${BOOKS_DIR}:/books
       - ${DATA_DIR}/books:/calibre_books
       - ${BOOKDROP_DIR}:/bookdrop
-      - ${DATA_DIR}/boolkore:/app/data
+      - ${DATA_DIR}/booklore:/app/data
     depends_on:
       mariadb:
         condition: service_healthy
@@ -349,7 +349,7 @@ services:
       PGID: "${PGID}"
       TZ: "${TZ}"
     volumes:
-      - ${MEDIA_DIR}/usenet:/downloads
+      - ${MEDIA_DIR}/usenet:/data/usenet
       - "${CONFIG_DIR}/sabnzbd:/config"
     ports:
       - 6789:6789
@@ -456,6 +456,8 @@ services:
       TZ: ${TZ}
       ABS_SERVER: ${ABS_SERVER}
       ABS_KEY: ${ABS_KEY}
+      BOOKLORE_USER: ${BOOKLORE_USER}
+      BOOKLORE_KEY: ${BOOKLORE_KEY}
       KOSYNC_SERVER: "https://${BOOKS_HOST}/api/koreader"
       KOSYNC_USER: ${KOSYNC_USER}
       KOSYNC_KEY: ${KOSYNC_KEY}
