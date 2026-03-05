@@ -268,6 +268,8 @@ services:
     environment:
       PUID: ${PUID}
       PGID: ${PGID}
+      USER_ID: ${PUID}
+      GROUP_ID: ${PGID}
       TZ: ${TZ}
       DATABASE_URL: ${BOOKLORE_DATABASE_URL}
       DATABASE_USERNAME: ${BOOKLORE_DB_USER}
@@ -488,3 +490,65 @@ services:
       traefik.http.routers.convert.middlewares: hsts-header
       traefik.http.routers.convert.rule: Host(`${CONVERT_HOST}`)
       traefik.http.services.convert.loadbalancer.server.port: 80
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    environment:
+      PUID: "${PUID}"
+      PGID: "${PGID}"
+    volumes:
+      - "${CONFIG_DIR}/prowlarr:/config"
+      - ${MEDIA_DIR}:/data
+    network_mode: "service:gluetun"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.prowlarr.tls.certresolver: prod
+      traefik.http.routers.prowlarr.middlewares: hsts-header, authelia
+      traefik.http.routers.prowlarr.rule: Host(`prowlarr.${BASE_DOMAIN}`)
+      traefik.http.services.prowlarr.loadbalancer.server.port: 9696
+
+  shelfmark:
+    image: ghcr.io/calibrain/shelfmark:latest
+    container_name: shelfmark
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+    restart: unless-stopped
+    volumes:
+      - ${BOOKDROP_DIR}:/books # Default destination for book downloads
+      - ${CONFIG_DIR}/shelfmark/config:/config # App configuration
+      - ${BOOKS_DIR}:/downloads
+    network_mode: "service:gluetun"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.shelfmark.tls.certresolver: prod
+      traefik.http.routers.shelfmark.middlewares: hsts-header, authelia
+      traefik.http.routers.shelfmark.rule: Host(`shelfmark.${BASE_DOMAIN}`)
+      traefik.http.services.shelfmark.loadbalancer.server.port: 8084
+
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md#external-container-to-gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+      - 8084:8084/tcp # Shelfmark
+    volumes:
+      - ${DATA_DIR}/gluetun:/gluetun
+    environment:
+      # See https://github.com/qdm12/gluetun-wiki/tree/main/setup#setup
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      # Wireguard:
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      # Timezone for accurate log times
+      - TZ=${TZ}
+      - SERVER_COUNTRIES='United States'

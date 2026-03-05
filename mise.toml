@@ -1,0 +1,3 @@
+[tools]
+lefthook = { version = "latest" }
+gitleaks = "latest"
