@@ -35,8 +35,11 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [IT-Tools](https://it-tools.tech/) - A collection of useful tools for developers.
 - [Copyparty](https://github.com/copyparty/copyparty) - A file sharing server.
 - [ClipCascade](https://github.com/sathvikrao/clipcascade) - A self-hosted clipboard manager.
-- [abs-kosync](https://github.com/cporcellijr/abs-kosync-bridge) - A bridge between Audiobookshelf and KOReader. *
+- [abs-kosync](https://github.com/cporcellijr/abs-kosync-bridge) - A bridge between Audiobookshelf and KOReader.
 - [convert](https://github.com/p2r3/convert) - Truly universal online file converter
+- [Prowlarr](https://prowlarr.com/) - An indexer manager/proxy built on the popular *arr .net/reactjs base stack to integrate with your various PVR apps.
+- [Shelfmark](https://github.com/calibrain/shelfmark) - A self-hosted library manager for your ebooks.
+- [Gluetun](https://github.com/qdm12/gluetun) - VPN client in a Docker container for multiple VPN providers. *
 
 *not exposed
 
