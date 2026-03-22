@@ -10,6 +10,7 @@ docker rm -f dockhand || true
 
 docker run -d \
   --name dockhand \
+  --pull=always \
   --restart unless-stopped \
   --network homelab_default \
   --group-add 1001 \

@@ -1,3 +1,4 @@
 [tools]
 lefthook = { version = "latest" }
 gitleaks = "latest"
+yazi = "latest"

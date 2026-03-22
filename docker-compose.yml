@@ -89,33 +89,6 @@ services:
       traefik.http.services.code.loadbalancer.server.port: ${CODE_PORT}
       traefik.http.services.code.loadbalancer.server.scheme: http
 
-  # https://github.com/cfbender/personal-site
-  personal-site:
-    container_name: personal-site
-    build:
-      context: ../personal-site
-      dockerfile: Dockerfile
-      args:
-        - SHOW_DASHBOARD=true
-    restart: unless-stopped
-    environment:
-      PORT: ${WWW_PORT}
-      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
-      HOSTNAME: ${COOKIE_DOMAIN}
-    networks:
-      - default
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.personal-site.tls.certresolver: prod
-      traefik.http.routers.personal-site.rule: "Host(`${PERSONAL_SITE_HOST}`) || Host(`${COOKIE_DOMAIN}`)"
-      traefik.http.routers.personal-site.middlewares: hsts-header
-      traefik.http.routers.personal-site-dashboard.tls.certresolver: prod
-      traefik.http.routers.personal-site-dashboard.rule: "(Host(`${PERSONAL_SITE_HOST}`) || Host(`${COOKIE_DOMAIN}`)) && PathPrefix(`${DASHBOARD_PATH}`)"
-      traefik.http.routers.personal-site-dashboard.middlewares: hsts-header, authelia
-      traefik.http.services.personal-site.loadbalancer.server.port: ${WWW_PORT}
-      traefik.http.services.personal-site.loadbalancer.server.scheme: http
-
   # https://registry.hub.docker.com/r/adguard/adguardhome
   adguard:
     image: adguard/adguardhome
@@ -260,9 +233,9 @@ services:
       traefik.http.routers.homebox.rule: Host(`${HOMEBOX_HOST}`)
       traefik.http.routers.homebox.middlewares: hsts-header
 
-  # https://github.com/booklore-app/booklore
+  # https://github.com/grimmory-tools/grimmory
   booklore:
-    image: booklore/booklore:latest
+    image: grimmory/grimmory:latest
     container_name: booklore
     restart: unless-stopped
     environment:
@@ -343,26 +316,17 @@ services:
       traefik.http.routers.overseer.rule: Host(`request.${BASE_DOMAIN}`)
       traefik.http.services.overseer.loadbalancer.server.port: 5055
 
-  nzbget:
-    image: lscr.io/linuxserver/nzbget:latest
-    container_name: nzbget
-    environment:
-      PUID: "${PUID}"
-      PGID: "${PGID}"
-      TZ: "${TZ}"
-    volumes:
-      - ${MEDIA_DIR}/usenet:/data/usenet
-      - "${CONFIG_DIR}/sabnzbd:/config"
-    ports:
-      - 6789:6789
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:8
+    container_name: recyclarr
     restart: unless-stopped
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.nzbget.tls.certresolver: prod
-      traefik.http.routers.nzbget.middlewares: hsts-header
-      traefik.http.routers.nzbget.rule: Host(`nzb.${BASE_DOMAIN}`)
-      traefik.http.services.nzbget.loadbalancer.server.port: 6789
-
+    user: ${PUID}:${PUID}
+    volumes:
+      - ${CONFIG_DIR}/recyclarr:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -552,3 +516,4 @@ services:
       # Timezone for accurate log times
       - TZ=${TZ}
       - SERVER_COUNTRIES='United States'
+      - FIREWALL_OUTBOUND_SUBNETS=${SUBNET}

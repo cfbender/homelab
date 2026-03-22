@@ -29,9 +29,9 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Booklore](https://github.com/booklore-app/booklore) - A self-hosted eBook library manager and reader.
 - [MariaDB](https://mariadb.org/) - A popular open source database server. *
 - [Overseerr](https://overseerr.dev/) - A request management and media discovery tool for your home media server.
-- [NZBGet](https://nzbget.net/) - A popular usenet downloader.
 - [Radarr](https://radarr.video/) - A movie collection manager for Usenet and BitTorrent users.
 - [Sonarr](https://sonarr.tv/) - A PVR for Usenet and BitTorrent users.
+- [Recyclarr](https://recyclarr.dev/) - A configuration manager/syncer for radarr/sonarr
 - [IT-Tools](https://it-tools.tech/) - A collection of useful tools for developers.
 - [Copyparty](https://github.com/copyparty/copyparty) - A file sharing server.
 - [ClipCascade](https://github.com/sathvikrao/clipcascade) - A self-hosted clipboard manager.
