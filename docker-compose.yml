@@ -195,22 +195,22 @@ services:
       traefik.http.services.dashy.loadbalancer.server.scheme: http
 
   #https://github.com/cfbender/edison
-  edison:
-    container_name: edison
-    build:
-      context: ../edison
-      dockerfile: Dockerfile
-      args:
-        - EDISON_MECHMARKET_ROLE_ID=${EDISON_MECHMARKET_ROLE_ID}
-        - EDISON_MECHMARKET_QUERY=${EDISON_MECHMARKET_QUERY}
-        - EDISON_MECHMARKET_CHANNEL=${EDISON_MECHMARKET_CHANNEL}
-        - EDISON_BOT_TOKEN=${EDISON_BOT_TOKEN}
-    restart: unless-stopped
-    environment:
-      EDISON_MECHMARKET_ROLE_ID: ${EDISON_MECHMARKET_ROLE_ID}
-      EDISON_MECHMARKET_QUERY: ${EDISON_MECHMARKET_QUERY}
-      EDISON_MECHMARKET_CHANNEL: ${EDISON_MECHMARKET_CHANNEL}
-      EDISON_BOT_TOKEN: ${EDISON_BOT_TOKEN}
+  # edison:
+  #   container_name: edison
+  #   build:
+  #     context: ../edison
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - EDISON_MECHMARKET_ROLE_ID=${EDISON_MECHMARKET_ROLE_ID}
+  #       - EDISON_MECHMARKET_QUERY=${EDISON_MECHMARKET_QUERY}
+  #       - EDISON_MECHMARKET_CHANNEL=${EDISON_MECHMARKET_CHANNEL}
+  #       - EDISON_BOT_TOKEN=${EDISON_BOT_TOKEN}
+  #   restart: unless-stopped
+  #   environment:
+  #     EDISON_MECHMARKET_ROLE_ID: ${EDISON_MECHMARKET_ROLE_ID}
+  #     EDISON_MECHMARKET_QUERY: ${EDISON_MECHMARKET_QUERY}
+  #     EDISON_MECHMARKET_CHANNEL: ${EDISON_MECHMARKET_CHANNEL}
+  #     EDISON_BOT_TOKEN: ${EDISON_BOT_TOKEN}
 
   # https://github.com/hay-kot/homebox
   homebox:
@@ -234,9 +234,9 @@ services:
       traefik.http.routers.homebox.middlewares: hsts-header
 
   # https://github.com/grimmory-tools/grimmory
-  booklore:
+  grimmory:
     image: grimmory/grimmory:latest
-    container_name: booklore
+    container_name: grimmory
     restart: unless-stopped
     environment:
       PUID: ${PUID}
@@ -287,7 +287,7 @@ services:
       - ${DATA_DIR}/mariadb/config:/config
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -398,12 +398,12 @@ services:
     container_name: clipcascade
     restart: unless-stopped
     volumes:
-      - ${DATA_DIR}/cc_users:/database  # Persistent storage for user data
+      - ${DATA_DIR}/cc_users:/database # Persistent storage for user data
     environment:
-      - CC_MAX_MESSAGE_SIZE_IN_MiB=10   # Maximum message size in MiB (ignored if P2P mode is enabled)
-      - CC_P2P_ENABLED=false  # Enables or disables peer-to-peer(P2P) mode
+      - CC_MAX_MESSAGE_SIZE_IN_MiB=10 # Maximum message size in MiB (ignored if P2P mode is enabled)
+      - CC_P2P_ENABLED=false # Enables or disables peer-to-peer(P2P) mode
       - CC_ALLOWED_ORIGINS=https://clip.cfb.dev # Defines allowed CORS origins for security
-      - CC_SIGNUP_ENABLED=false  # Enables or disables user self-registration
+      - CC_SIGNUP_ENABLED=false # Enables or disables user self-registration
     labels:
       traefik.enable: "true"
       traefik.http.routers.clipcascade.tls.certresolver: prod
@@ -417,7 +417,7 @@ services:
     container_name: abs-kosync
     restart: unless-stopped
     depends_on:
-      - booklore
+      - grimmory
     environment:
       TZ: ${TZ}
       ABS_SERVER: ${ABS_SERVER}
@@ -441,7 +441,7 @@ services:
       traefik.http.routers.kosyncnoauth.middlewares: hsts-header
       traefik.http.routers.kosyncnoauth.rule: "Host(`${KOSYNC_HOST}`) && PathPrefix(`/sync`)"
       traefik.http.services.kosync.loadbalancer.server.port: 5757
-      
+
   convert:
     image: ghcr.io/p2r3/convert:latest
     container_name: convert
@@ -517,3 +517,31 @@ services:
       - TZ=${TZ}
       - SERVER_COUNTRIES='United States'
       - FIREWALL_OUTBOUND_SUBNETS=${SUBNET}
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    restart: unless-stopped
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_URL}
+    volumes:
+      - ${DATA_DIR}/openwebui:/app/backend/data
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.ai.tls.certresolver: prod
+      traefik.http.routers.ai.middlewares: hsts-header
+      traefik.http.routers.ai.rule: Host(`ai.${BASE_DOMAIN}`)
+      traefik.http.services.ai.loadbalancer.server.port: 8080
+
+  houndarr:
+    image: ghcr.io/av1155/houndarr:latest
+    container_name: houndarr
+    restart: unless-stopped
+    ports:
+      - "8877:8877"
+    volumes:
+      - ${DATA_DIR}/houndarr:/data
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}

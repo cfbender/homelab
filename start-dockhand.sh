@@ -16,7 +16,9 @@ docker run -d \
   --group-add 1001 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "${DATA_DIR}/dockhand:/app/data" \
-  -v ./:/homelab \
+  -v ./:/home/code/github/homelab \
+  -v ../home-config/:/home/code/github/home-config \
+  -p 3000:3000 \
   --label "traefik.enable=true" \
   --label "traefik.docker.network=homelab_default" \
   --label "traefik.http.routers.dockhand.tls.certresolver=prod" \
