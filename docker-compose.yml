@@ -545,3 +545,27 @@ services:
       - TZ=${TZ}
       - PUID=${PUID}
       - PGID=${PGID}
+
+  manavault:
+    image: ghcr.io/cfbender/manavault:latest-openvino
+    container_name: manavault
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    volumes:
+      - ${DATA_DIR}/manavault:/data
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - SECRET_KEY_BASE=${MANAVAULT_SECRET_KEY}
+      - PHX_HOST=${MANAVAULT_HOST}
+      - MANAVAULT_OCR_ENGINE=openvino
+      - MANAVAULT_OCR_OPENVINO_PERFORMANCE_HINT=LATENCY
+      - MANAVAULT_OCR_THREADS=4
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.manavault.tls.certresolver: prod
+      traefik.http.routers.manavault.middlewares: hsts-header, authelia
+      traefik.http.routers.manavault.rule: Host(`${MANAVAULT_HOST}`)
+      traefik.http.services.manavault.loadbalancer.server.port: 4000

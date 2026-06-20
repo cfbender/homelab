@@ -1,0 +1,18 @@
+http:
+  routers:
+    jellyfin:
+      rule: "Host(`<JELLYFIN HOST>`)"
+      service: jellyfin
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: prod
+      middlewares:
+        - secure-headers@file
+
+  services:
+    jellyfin:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "<JELLYFIN URL>"

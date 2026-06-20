@@ -1,0 +1,18 @@
+http:
+  routers:
+    fladder:
+      rule: "Host(`<FLADDER HOST>`)"
+      service: fladder
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: prod
+      middlewares:
+        - secure-headers@file
+
+  services:
+    fladder:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "<FLADDER URL>"
