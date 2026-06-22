@@ -547,7 +547,7 @@ services:
       - PGID=${PGID}
 
   manavault:
-    image: ghcr.io/cfbender/manavault:latest-openvino
+    image: ghcr.io/cfbender/manavault:latest
     container_name: manavault
     restart: unless-stopped
     ports:
@@ -568,4 +568,7 @@ services:
       traefik.http.routers.manavault.tls.certresolver: prod
       traefik.http.routers.manavault.middlewares: hsts-header, authelia
       traefik.http.routers.manavault.rule: Host(`${MANAVAULT_HOST}`)
+      traefik.http.routers.manavaultnoauth.tls.certresolver: prod
+      traefik.http.routers.manavaultnoauth.middlewares: hsts-header
+      traefik.http.routers.manavaultnoauth.rule: "Host(`${MANAVAULT_HOST}`) && PathPrefix(`/share`)"
       traefik.http.services.manavault.loadbalancer.server.port: 4000
