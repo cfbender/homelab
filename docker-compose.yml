@@ -560,15 +560,10 @@ services:
       - PGID=${PGID}
       - SECRET_KEY_BASE=${MANAVAULT_SECRET_KEY}
       - PHX_HOST=${MANAVAULT_HOST}
-      - MANAVAULT_OCR_ENGINE=openvino
-      - MANAVAULT_OCR_OPENVINO_PERFORMANCE_HINT=LATENCY
-      - MANAVAULT_OCR_THREADS=4
+      - MANAVAULT_ADMIN_PASSWORD_HASH=${MANAVAULT_ADMIN_PASSWORD_HASH}
     labels:
-      traefik.enable: "true"
-      traefik.http.routers.manavault.tls.certresolver: prod
-      traefik.http.routers.manavault.middlewares: hsts-header, authelia
-      traefik.http.routers.manavault.rule: Host(`${MANAVAULT_HOST}`)
-      traefik.http.routers.manavaultnoauth.tls.certresolver: prod
-      traefik.http.routers.manavaultnoauth.middlewares: hsts-header
-      traefik.http.routers.manavaultnoauth.rule: "Host(`${MANAVAULT_HOST}`) && PathPrefix(`/share`)"
-      traefik.http.services.manavault.loadbalancer.server.port: 4000
+     traefik.enable: "true"
+     traefik.http.services.manavault.loadbalancer.server.port: 4000
+     traefik.http.routers.manavault.tls.certresolver: prod
+     traefik.http.routers.manavault.rule: Host(`${MANAVAULT_HOST}`)
+     traefik.http.routers.manavault.middlewares: hsts-header
