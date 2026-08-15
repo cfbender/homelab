@@ -212,26 +212,26 @@ services:
   #     EDISON_MECHMARKET_CHANNEL: ${EDISON_MECHMARKET_CHANNEL}
   #     EDISON_BOT_TOKEN: ${EDISON_BOT_TOKEN}
 
-  # https://github.com/hay-kot/homebox
+  # https://github.com/sysadminsmedia/homebox
   homebox:
-    image: ghcr.io/hay-kot/homebox:latest
+    image: ghcr.io/sysadminsmedia/homebox:latest
     container_name: homebox
     restart: unless-stopped
     environment:
       - HBOX_LOG_LEVEL=info
       - HBOX_LOG_FORMAT=text
       - HBOX_WEB_MAX_UPLOAD_SIZE=10
-      - HBOX_OPTIONS_ALLOW_REGISTRATION=true
+      - HBOX_OPTIONS_ALLOW_ANALYTICS=false
+      - HBOX_AUTH_API_KEY_PEPPER=${HOMEBOX_API_KEY_PEPPER}
     volumes:
       - ${DATA_DIR}/homebox:/data/
-    ports:
-      - 3100:7745
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
       traefik.http.routers.homebox.tls.certresolver: prod
       traefik.http.routers.homebox.rule: Host(`${HOMEBOX_HOST}`)
       traefik.http.routers.homebox.middlewares: hsts-header
+      traefik.http.services.homebox.loadbalancer.server.port: 7745
 
   # https://github.com/grimmory-tools/grimmory
   grimmory:
@@ -550,6 +550,12 @@ services:
     image: ghcr.io/cfbender/manavault:latest
     container_name: manavault
     restart: unless-stopped
+    healthcheck:
+     test: ["CMD", "/usr/local/bin/manavault-healthcheck"]
+     interval: 30s
+     timeout: 5s
+     start_period: 30s
+     retries: 3
     ports:
       - "4000:4000"
     volumes:
