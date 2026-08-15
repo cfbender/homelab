@@ -411,10 +411,10 @@ services:
       traefik.http.routers.clipcascade.rule: Host(`${CLIPCASCADE_HOST}`)
       traefik.http.services.clipcascade.loadbalancer.server.port: 8080
 
-  #https://github.com/cporcellijr/abs-kosync-bridge
-  abs-kosync:
-    image: ghcr.io/cporcellijr/abs-kosync-bridge:latest
-    container_name: abs-kosync
+  #https://github.com/cporcellijr/bookbridge
+  bookbridge:
+    image: ghcr.io/cporcellijr/bookbridge:latest
+    container_name: bookbridge
     restart: unless-stopped
     depends_on:
       - grimmory
@@ -428,19 +428,19 @@ services:
       KOSYNC_USER: ${KOSYNC_USER}
       KOSYNC_KEY: ${KOSYNC_KEY}
     volumes:
-      - ${DATA_DIR}/abs_kosync:/data
+      - ${DATA_DIR}/bookbridge:/data
       - ${BOOKS_DIR}:/books
     networks:
       - default
     labels:
       traefik.enable: "true"
-      traefik.http.routers.kosync.tls.certresolver: prod
-      traefik.http.routers.kosync.middlewares: hsts-header, authelia
-      traefik.http.routers.kosync.rule: "Host(`${KOSYNC_HOST}`)"
-      traefik.http.routers.kosyncnoauth.tls.certresolver: prod
-      traefik.http.routers.kosyncnoauth.middlewares: hsts-header
-      traefik.http.routers.kosyncnoauth.rule: "Host(`${KOSYNC_HOST}`) && PathPrefix(`/sync`)"
-      traefik.http.services.kosync.loadbalancer.server.port: 5757
+      traefik.http.routers.bookbridge.tls.certresolver: prod
+      traefik.http.routers.bookbridge.middlewares: hsts-header, authelia
+      traefik.http.routers.bookbridge.rule: "Host(`${BOOKBRIDGE_HOST}`)"
+      traefik.http.routers.bookbridgenoauth.tls.certresolver: prod
+      traefik.http.routers.bookbridgenoauth.middlewares: hsts-header
+      traefik.http.routers.bookbridgenoauth.rule: "Host(`${BOOKBRIDGE_HOST}`) && PathPrefix(`/sync`)"
+      traefik.http.services.bookbridge.loadbalancer.server.port: 5757
 
   convert:
     image: ghcr.io/p2r3/convert:latest
