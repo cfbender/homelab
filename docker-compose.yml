@@ -573,3 +573,33 @@ services:
      traefik.http.routers.manavault.tls.certresolver: prod
      traefik.http.routers.manavault.rule: Host(`${MANAVAULT_HOST}`)
      traefik.http.routers.manavault.middlewares: hsts-header
+  nimotsu:
+    image: ghcr.io/cfbender/nimotsu:latest
+    container_name: nimotsu
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/nimotsu:/data
+      - ${SECRETS_DIR}/nimotsu/firebase.json:/run/secrets/firebase.json:ro
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - NIMOTSU_API_TOKEN=${NIMOTSU_API_TOKEN}
+      - NIMOTSU_SHIPPO_API_TOKEN=${NIMOTSU_SHIPPO_API_TOKEN}
+      - NIMOTSU_SHIPPO_WEBHOOK_TOKEN=${NIMOTSU_SHIPPO_WEBHOOK_TOKEN}
+      - NIMOTSU_PUBLIC_URL=https://${NIMOTSU_HOST}
+      - NIMOTSU_GMAIL_CLIENT_ID=${NIMOTSU_GMAIL_CLIENT_ID}
+      - NIMOTSU_GMAIL_CLIENT_SECRET=${NIMOTSU_GMAIL_CLIENT_SECRET}
+      - NIMOTSU_ENCRYPTION_KEY=${NIMOTSU_ENCRYPTION_KEY}
+      - NIMOTSU_FIREBASE_CREDENTIALS=/run/secrets/firebase.json
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.nimotsu.loadbalancer.server.port: "8080"
+      traefik.http.routers.nimotsu.rule: Host(`${NIMOTSU_HOST}`)
+      traefik.http.routers.nimotsu.tls.certresolver: prod
+      traefik.http.routers.nimotsu.middlewares: hsts-header,authelia
+      traefik.http.routers.nimotsu-api.rule: Host(`${NIMOTSU_HOST}`) && PathPrefix(`/api/`)
+      traefik.http.routers.nimotsu-api.priority: "100"
+      traefik.http.routers.nimotsu-api.tls.certresolver: prod
+      traefik.http.routers.nimotsu-api.middlewares: hsts-header
+      traefik.http.routers.nimotsu-api.service: nimotsu

@@ -10,3 +10,4 @@ fail2ban/jail.d/homeassistant.conf
 mariadb/
 .env
 docker-compose.override.yml
+secrets/
