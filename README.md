@@ -40,6 +40,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Prowlarr](https://prowlarr.com/) - An indexer manager/proxy built on the popular *arr .net/reactjs base stack to integrate with your various PVR apps.
 - [Shelfmark](https://github.com/calibrain/shelfmark) - A self-hosted library manager for your ebooks.
 - [Gluetun](https://github.com/qdm12/gluetun) - VPN client in a Docker container for multiple VPN providers. *
+- [The Gathering](https://github.com/cfbender/the-gathering) - A self-hosted Magic: The Gathering playgroup and collection manager.
 
 *not exposed
 
