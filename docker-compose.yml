@@ -586,41 +586,13 @@ services:
       - SECRET_KEY_BASE=${MANAVAULT_SECRET_KEY}
       - PHX_HOST=${MANAVAULT_HOST}
       - MANAVAULT_ADMIN_PASSWORD_HASH=${MANAVAULT_ADMIN_PASSWORD_HASH}
+      - SCANNER_CORRECTIONS_TOKEN=${CARDID_CORRECTIONS_TOKEN:-}
     labels:
      traefik.enable: "true"
      traefik.http.services.manavault.loadbalancer.server.port: 4000
      traefik.http.routers.manavault.tls.certresolver: prod
      traefik.http.routers.manavault.rule: Host(`${MANAVAULT_HOST}`)
      traefik.http.routers.manavault.middlewares: hsts-header
-
-  # https://github.com/cfbender/the-gathering
-  the-gathering:
-    image: ghcr.io/cfbender/the-gathering:latest
-    container_name: the-gathering
-    restart: unless-stopped
-    volumes:
-      - ${DATA_DIR}/the-gathering:/data
-    environment:
-      - TZ=${TZ}
-      - SECRET_KEY_BASE=${THE_GATHERING_SECRET_KEY_BASE}
-      - PHX_HOST=${THE_GATHERING_HOST}
-      - PHX_SCHEME=https
-      - PHX_URL_PORT=443
-      - TRUST_PROXY_HEADERS=true
-      - MANAVAULT_URL=https://${MANAVAULT_HOST}
-      - DISCORD_CLIENT_ID=${THE_GATHERING_DISCORD_CLIENT_ID}
-      - DISCORD_CLIENT_SECRET=${THE_GATHERING_DISCORD_CLIENT_SECRET}
-      - DISCORD_BOT_TOKEN=${THE_GATHERING_DISCORD_BOT_TOKEN}
-      - DISCORD_GUILD_ID=${THE_GATHERING_DISCORD_GUILD_ID}
-      - CLOUDFLARE_TURN_KEY_ID=${CLOUDFLARE_TURN_KEY_ID:-}
-      - CLOUDFLARE_TURN_API_TOKEN=${CLOUDFLARE_TURN_API_TOKEN:-}
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.services.the-gathering.loadbalancer.server.port: 4000
-      traefik.http.routers.the-gathering.tls.certresolver: prod
-      traefik.http.routers.the-gathering.rule: Host(`${THE_GATHERING_HOST}`)
-      traefik.http.routers.the-gathering.middlewares: hsts-header
 
   nimotsu:
     image: ghcr.io/cfbender/nimotsu:latest
