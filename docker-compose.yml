@@ -362,6 +362,25 @@ services:
       traefik.http.routers.sonarr.rule: Host(`sonarr.${BASE_DOMAIN}`)
       traefik.http.services.sonarr.loadbalancer.server.port: 8989
 
+  # https://www.bazarr.media/
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    environment:
+      PUID: "${PUID}"
+      PGID: "${PGID}"
+      TZ: "${TZ}"
+    volumes:
+      - "${CONFIG_DIR}/bazarr:/config"
+      - ${MEDIA_DIR}:/data
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bazarr.tls.certresolver: prod
+      traefik.http.routers.bazarr.middlewares: hsts-header, authelia
+      traefik.http.routers.bazarr.rule: Host(`bazarr.${BASE_DOMAIN}`)
+      traefik.http.services.bazarr.loadbalancer.server.port: 6767
+
   tools:
     image: corentinth/it-tools:latest
     container_name: tools

@@ -31,6 +31,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Overseerr](https://overseerr.dev/) - A request management and media discovery tool for your home media server.
 - [Radarr](https://radarr.video/) - A movie collection manager for Usenet and BitTorrent users.
 - [Sonarr](https://sonarr.tv/) - A PVR for Usenet and BitTorrent users.
+- [Bazarr](https://www.bazarr.media/) - A companion to Sonarr and Radarr that manages and downloads subtitles.
 - [Recyclarr](https://recyclarr.dev/) - A configuration manager/syncer for radarr/sonarr
 - [IT-Tools](https://it-tools.tech/) - A collection of useful tools for developers.
 - [Copyparty](https://github.com/copyparty/copyparty) - A file sharing server.
