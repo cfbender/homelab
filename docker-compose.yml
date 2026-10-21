@@ -575,8 +575,9 @@ services:
      timeout: 5s
      start_period: 30s
      retries: 3
-    ports:
-      - "4000:4000"
+    mem_limit: 2g
+    # Not published: Traefik reaches it over homelab_default. Routing lives in
+    # traefik/conf/manavault.yml (Cloudflare-only origin, body limit).
     volumes:
       - ${DATA_DIR}/manavault:/data
     environment:
@@ -587,12 +588,9 @@ services:
       - PHX_HOST=${MANAVAULT_HOST}
       - MANAVAULT_ADMIN_PASSWORD_HASH=${MANAVAULT_ADMIN_PASSWORD_HASH}
       - SCANNER_CORRECTIONS_TOKEN=${CARDID_CORRECTIONS_TOKEN:-}
-    labels:
-     traefik.enable: "true"
-     traefik.http.services.manavault.loadbalancer.server.port: 4000
-     traefik.http.routers.manavault.tls.certresolver: prod
-     traefik.http.routers.manavault.rule: Host(`${MANAVAULT_HOST}`)
-     traefik.http.routers.manavault.middlewares: hsts-header
+      - MANAVAULT_SECURE_COOKIES=true
+      - MANAVAULT_TRUST_PROXY_HEADERS=true
+      - MANAVAULT_FORWARDED_IP_HEADER=CF-Connecting-IP
 
   # https://github.com/strausmann/mcp-dockhand
   mcp-dockhand:
