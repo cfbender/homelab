@@ -21,7 +21,9 @@ services:
       CF_API_EMAIL: "${CF_API_EMAIL}"
       CF_API_KEY: "${CF_API_KEY}"
     networks:
-      - default
+      default:
+        # Fixed so backends can trust only Traefik's forwarded headers.
+        ipv4_address: 172.20.69.20
     ports:
       - target: 80
         published: 80
@@ -514,6 +516,7 @@ services:
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
+    restart: unless-stopped
     # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md#external-container-to-gluetun
     cap_add:
       - NET_ADMIN
@@ -537,20 +540,20 @@ services:
       - SERVER_COUNTRIES='United States'
       - FIREWALL_OUTBOUND_SUBNETS=${SUBNET}
 
-  openwebui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: openwebui
-    restart: unless-stopped
-    environment:
-      OLLAMA_BASE_URL: ${OLLAMA_URL}
-    volumes:
-      - ${DATA_DIR}/openwebui:/app/backend/data
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.ai.tls.certresolver: prod
-      traefik.http.routers.ai.middlewares: hsts-header
-      traefik.http.routers.ai.rule: Host(`ai.${BASE_DOMAIN}`)
-      traefik.http.services.ai.loadbalancer.server.port: 8080
+  # openwebui:
+  #   image: ghcr.io/open-webui/open-webui:main
+  #   container_name: openwebui
+  #   restart: unless-stopped
+  #   environment:
+  #     OLLAMA_BASE_URL: ${OLLAMA_URL}
+  #   volumes:
+  #     - ${DATA_DIR}/openwebui:/app/backend/data
+  #   labels:
+  #     traefik.enable: "true"
+  #     traefik.http.routers.ai.tls.certresolver: prod
+  #     traefik.http.routers.ai.middlewares: hsts-header
+  #     traefik.http.routers.ai.rule: Host(`ai.${BASE_DOMAIN}`)
+  #     traefik.http.services.ai.loadbalancer.server.port: 8080
 
   houndarr:
     image: ghcr.io/av1155/houndarr:latest
@@ -591,6 +594,36 @@ services:
       - MANAVAULT_SECURE_COOKIES=true
       - MANAVAULT_TRUST_PROXY_HEADERS=true
       - MANAVAULT_FORWARDED_IP_HEADER=CF-Connecting-IP
+      - MANAVAULT_TRUSTED_PROXIES=172.20.69.20/32
+
+  # Public ManaVault demo for Google Play review and closed testers. Separate
+  # data and owner password; reset nightly from data/manavault-demo-seed by
+  # scripts/manavault-demo-reset.sh. Routing in traefik/conf/manavault-demo.yml.
+  manavault-demo:
+    image: ghcr.io/cfbender/manavault:latest
+    container_name: manavault-demo
+    restart: unless-stopped
+    healthcheck:
+     test: ["CMD", "/usr/local/bin/manavault-healthcheck"]
+     interval: 30s
+     timeout: 5s
+     start_period: 30s
+     retries: 3
+    mem_limit: 1g
+    volumes:
+      - ${DATA_DIR}/manavault-demo:/data
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - MANAVAULT_SECRET_KEY=${MANAVAULT_DEMO_SECRET_KEY}
+      - MANAVAULT_PUBLIC_HOST=${MANAVAULT_DEMO_HOST}
+      - MANAVAULT_ADMIN_PASSWORD_HASH=${MANAVAULT_DEMO_ADMIN_PASSWORD_HASH}
+      - MANAVAULT_SECURE_COOKIES=true
+      - MANAVAULT_TRUST_PROXY_HEADERS=true
+      - MANAVAULT_FORWARDED_IP_HEADER=CF-Connecting-IP
+      - MANAVAULT_TRUSTED_PROXIES=172.20.69.20/32
+      - SCANNER_BUNDLE_SOURCE=github
 
   # https://github.com/strausmann/mcp-dockhand
   mcp-dockhand:
