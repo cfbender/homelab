@@ -649,6 +649,36 @@ services:
       traefik.http.middlewares.dockhand-mcp-lan.ipallowlist.sourcerange: ${SUBNET}
       traefik.http.services.dockhand-mcp.loadbalancer.server.port: 8080
 
+  # https://github.com/louislam/uptime-kuma
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+      # Skip the first-run database picker.
+      UPTIME_KUMA_DB_TYPE: sqlite
+    volumes:
+      - ${DATA_DIR}/uptime-kuma:/app/data
+      # Read-only socket for Docker container monitors.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - default
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.routers.uptime-kuma.tls.certresolver: prod
+      traefik.http.routers.uptime-kuma.rule: Host(`uptime.${BASE_DOMAIN}`)
+      traefik.http.routers.uptime-kuma.middlewares: hsts-header, authelia
+      traefik.http.routers.uptime-kuma.service: uptime-kuma
+      # Push monitors (scripts/proxmox-health-push.sh) skip Authelia, LAN only.
+      traefik.http.routers.uptime-kuma-push.tls.certresolver: prod
+      traefik.http.routers.uptime-kuma-push.rule: Host(`uptime.${BASE_DOMAIN}`) && PathPrefix(`/api/push/`)
+      traefik.http.routers.uptime-kuma-push.middlewares: hsts-header, uptime-kuma-push-lan
+      traefik.http.routers.uptime-kuma-push.service: uptime-kuma
+      traefik.http.middlewares.uptime-kuma-push-lan.ipallowlist.sourcerange: ${SUBNET}
+      traefik.http.services.uptime-kuma.loadbalancer.server.port: 3001
+
   nimotsu:
     image: ghcr.io/cfbender/nimotsu:latest
     container_name: nimotsu

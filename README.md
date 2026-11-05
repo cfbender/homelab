@@ -42,6 +42,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Shelfmark](https://github.com/calibrain/shelfmark) - A self-hosted library manager for your ebooks.
 - [Gluetun](https://github.com/qdm12/gluetun) - VPN client in a Docker container for multiple VPN providers. *
 - [The Gathering](https://github.com/cfbender/the-gathering) - A self-hosted Magic: The Gathering playgroup and collection manager.
+- [Uptime Kuma](https://github.com/louislam/uptime-kuma) - A fancy self-hosted monitoring tool.
 
 *not exposed
 
