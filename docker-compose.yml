@@ -37,6 +37,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/log:/var/log
       - ./traefik:/etc/traefik:rw
+    # Needs `ping: {}` in traefik/traefik.yml.
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -82,6 +89,12 @@ services:
       - ${CODE_DIR}:/home/code
     networks:
       - default
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:${CODE_PORT}/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       traefik.docker.network: homelab_default
@@ -101,6 +114,13 @@ services:
       - ${DATA_DIR}/adguard:/opt/adguardhome/work
       - ${CONFIG_DIR}/adguard:/opt/adguardhome/conf
     dns: ${GATEWAY_IP}
+    # DNS answers on :53 and the web UI Traefik routes to on :3333.
+    healthcheck:
+      test: nslookup ${ADGUARD_HOST} 127.0.0.1 > /dev/null && wget -q --spider http://127.0.0.1:3333/login.html
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
     labels:
       traefik.enable: "true"
       traefik.http.routers.adguard.tls.certresolver: prod
@@ -123,9 +143,17 @@ services:
     volumes:
       - ${CONFIG_DIR}/adguard:/config
     ports:
-      - 8090:8080
+      - 8090:8090
     networks:
       - default
+    # /readyz returns 503 when the last sync with origin or replica failed.
+    # The sync API listens on 8090 (api.port in adguardhome-sync.yaml).
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8090/readyz"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 
   # https://github.com/authelia/authelia
   authelia:
@@ -168,6 +196,14 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - default
+    # Anonymous logins are disabled, so an MQTT "not authorised" CONNACK
+    # (exit 5) shows the broker is accepting and answering connections.
+    healthcheck:
+      test: mosquitto_sub -h 127.0.0.1 -t '$$SYS/broker/uptime' -C 1 -W 3; [ $$? -eq 5 ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   #https://github.com/Lissy93/dashy
   dashy:
@@ -329,6 +365,13 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    # No server to probe: syncs run @daily. Unhealthy when the newest sync log
+    # is older than 26h or logged an error.
+    healthcheck:
+      test: f=$$(ls -t /config/logs/cli/*.debug.log | head -1) && [ -n "$$(find "$$f" -mmin -1560)" ] && ! grep -qE ' (ERR|FTL)\]' "$$f"
+      interval: 1m
+      timeout: 10s
+      retries: 1
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -340,6 +383,12 @@ services:
     volumes:
       - "${CONFIG_DIR}/radarr:/config"
       - ${MEDIA_DIR}:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:7878/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       traefik.http.routers.radarr.tls.certresolver: prod
@@ -357,6 +406,12 @@ services:
     volumes:
       - "${CONFIG_DIR}/sonarr:/config"
       - ${MEDIA_DIR}:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8989/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       traefik.http.routers.sonarr.tls.certresolver: prod
@@ -376,6 +431,12 @@ services:
     volumes:
       - "${CONFIG_DIR}/bazarr:/config"
       - ${MEDIA_DIR}:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:6767/api/system/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       traefik.http.routers.bazarr.tls.certresolver: prod
@@ -389,6 +450,13 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
+    # nginx listens on IPv4 only, so use 127.0.0.1 rather than localhost.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     labels:
       traefik.enable: "true"
       traefik.http.routers.tools.tls.certresolver: prod
@@ -407,6 +475,12 @@ services:
       - "${CONFIG_DIR}/copyparty:/cfg"
       - ${DATA_DIR}/copyparty:/data
       - ${FILES_DIR}:/w
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3923/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     labels:
       traefik.enable: "true"
       traefik.http.routers.copyparty.tls.certresolver: prod
@@ -425,6 +499,12 @@ services:
       - CC_P2P_ENABLED=false # Enables or disables peer-to-peer(P2P) mode
       - CC_ALLOWED_ORIGINS=https://clip.cfb.dev # Defines allowed CORS origins for security
       - CC_SIGNUP_ENABLED=false # Enables or disables user self-registration
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     labels:
       traefik.enable: "true"
       traefik.http.routers.clipcascade.tls.certresolver: prod
@@ -469,6 +549,12 @@ services:
     restart: unless-stopped
     ports:
       - "8082:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/convert/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     labels:
       traefik.enable: "true"
       traefik.http.routers.convert.tls.certresolver: prod
@@ -487,6 +573,12 @@ services:
       - "${CONFIG_DIR}/prowlarr:/config"
       - ${MEDIA_DIR}:/data
     network_mode: "service:gluetun"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:9696/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       traefik.http.routers.prowlarr.tls.certresolver: prod

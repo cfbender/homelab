@@ -9,6 +9,9 @@ accessLog:
 
 api: {}
 
+# Serves /ping on the internal :8080 entrypoint for `traefik healthcheck --ping`.
+ping: {}
+
 providers:
   docker:
     exposedByDefault: false
