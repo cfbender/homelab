@@ -55,6 +55,22 @@ services:
     extra_hosts:
       - host.docker.internal:172.17.0.1
 
+  # https://github.com/cloudflare/cloudflared
+  # Public *.cfb.dev traffic arrives through this tunnel and goes on to Traefik.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    user: ${PUID}:${PGID}
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+      - ${SECRETS_DIR}/cloudflared/credentials.json:/etc/cloudflared/credentials.json:ro
+    networks:
+      default:
+        # Fixed so Traefik and ManaVault can trust its forwarded headers.
+        ipv4_address: 172.20.69.30
+
   # https://github.com/esphome/esphome
   esphome:
     image: esphome/esphome

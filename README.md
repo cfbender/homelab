@@ -43,6 +43,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Gluetun](https://github.com/qdm12/gluetun) - VPN client in a Docker container for multiple VPN providers. *
 - [The Gathering](https://github.com/cfbender/the-gathering) - A self-hosted Magic: The Gathering playgroup and collection manager.
 - [Uptime Kuma](https://github.com/louislam/uptime-kuma) - A fancy self-hosted monitoring tool.
+- [cloudflared](https://github.com/cloudflare/cloudflared) - Cloudflare Tunnel connector; public traffic reaches Traefik through it instead of a port forward. *
 
 *not exposed
 
@@ -60,7 +61,7 @@ Since switching to dockhand, I have started storing secrets in there, so there m
 
 Copy `traefik/traefik.yml.sample` to `traefik/traefik.yml` and fill in the `ACME_EMAIL` and `PILOT_TOKEN` variables (the pilot token is an optional property for Traefik Pilot, feel free to remove the section all-together).
 
-Be sure to port forward `:443` on your router to get access externally.
+External access comes through a Cloudflare Tunnel, so no ports need forwarding (see [Cloudflare](#cloudflare)).
 
 It is recommended to use the `staging` cert resolver initially to avoid any potential rate limits from Let's Encrypt for any misconfigured services.
 
@@ -147,7 +148,9 @@ docker-compose up -d
 
 ## Cloudflare
 
-This configuration is set up for a domain proxied through Cloudflare. You can remove this by removing the `CF_API_KEY` and `CF_API_EMAIL` environment cariables, as well as the `entrypoints.websecure.forwardedHeaders.trustedIPs` config in `traefik/traefik.yml`.
+This configuration is set up for a domain proxied through Cloudflare. Traefik gets its certificates by DNS challenge with `CF_API_KEY` and `CF_API_EMAIL`.
+
+Public traffic reaches Traefik through the `cloudflared` container, configured in `cloudflared/config.yml`. It runs a locally-managed tunnel whose credentials live in `${SECRETS_DIR}/cloudflared/credentials.json`, and it forwards every `*.cfb.dev` request to Traefik on 443. Each public hostname is a proxied `CNAME` to `<tunnel-id>.cfargotunnel.com`; add one in Cloudflare DNS to publish a new service. cloudflared has a fixed IP (`172.20.69.30`) that Traefik trusts in `entrypoints.websecure.forwardedHeaders.trustedIPs`, so backends see the real client IP. LAN clients skip the tunnel, since AdGuard resolves `*.cfb.dev` straight to Traefik.
 
 ## Middlewares
 

@@ -1,0 +1,15 @@
+# Cloudflare Tunnel "homelab". Every public *.cfb.dev hostname is a proxied CNAME to
+# eb2bf674-e1ec-40df-b556-a91f54671c1f.cfargotunnel.com, and Traefik routes it from there.
+# Credentials live in ${SECRETS_DIR}/cloudflared/credentials.json.
+tunnel: eb2bf674-e1ec-40df-b556-a91f54671c1f
+credentials-file: /etc/cloudflared/credentials.json
+metrics: 0.0.0.0:2000
+no-autoupdate: true
+
+ingress:
+  - hostname: "*.cfb.dev"
+    service: https://traefik:443
+    originRequest:
+      # Send the request's host as SNI so Traefik presents (and cloudflared verifies) its cert.
+      matchSNItoHost: true
+  - service: http_status:404
