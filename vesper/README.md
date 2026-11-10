@@ -1,8 +1,17 @@
 # Vesper rollout — primary alerts enabled
 
-This directory is a separate Compose project, originally deployed alongside Kuma on 2026-11-10. It is not included in the main `docker-compose.yml`. The Compose project keeps its existing `vesper-shadow` name to avoid creating a second instance.
+Vesper runs as service and container `vesper` in the main `docker-compose.yml`, under the `homelab` project. This directory holds producer scripts and rollout history, not a separate stack. The former `vesper-shadow` project is retired; do not start a second instance against the same database.
 
-Compose now uses `ghcr.io/cfbender/vesper:latest` directly; no rollout environment file is required. This tag change does not pull an image or recreate the running container. Discovery remains disabled. Historical image pins below record what was deployed, not the tag's future contents.
+Compose uses `ghcr.io/cfbender/vesper:latest` directly. Configuration, data and secrets use the main stack's `${CONFIG_DIR}/vesper`, `${DATA_DIR}/vesper` and `${SECRETS_DIR}/vesper` paths. Discovery remains disabled; Telegram alerts remain enabled. Historical image pins below record what was deployed, not the tag's future contents.
+
+For an approved Vesper-only update, run from the homelab root:
+
+```sh
+docker compose pull vesper
+docker compose up -d --no-deps --no-build --pull never vesper
+```
+
+The main-stack migration preserves the existing image, bind mounts, UID, resource limits, Authelia policy and LAN-only heartbeat rules. Traefik object names now use `vesper` instead of `vesper-shadow`. The pre-migration database, YAML, icons and old Compose configuration are backed up under ignored, owner-only `data/vesper-backups/compose-migration-20261110/`. Stop the current Vesper container before any rollback to the old project; never run both against the database.
 
 ## Reviewed discovery release deployed — 2026-11-10
 
@@ -87,7 +96,7 @@ Signed-in browser access has not been verified: no authenticated Authelia sessio
 From the homelab repository root, this renders configuration only; it does not pull, create or start containers:
 
 ```sh
-docker compose -f vesper/compose.yaml config --quiet
+docker compose config --quiet
 ```
 
 With a trusted Vesper binary available, this validates YAML without starting a server, opening SQLite, resolving secrets or sending network probes:
