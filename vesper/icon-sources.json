@@ -1,0 +1,78 @@
+{
+  "homebox": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/homebox.png",
+    "icon": "upload:a655d6cee76be67b6dce302d1c48aec99a280e57a2e4504820892a1bfa8800af.png"
+  },
+  "seerr": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/seerr.png",
+    "icon": "upload:86e64a251e3af461586bef1d59e54da7bfd3efda36c9ebb4840a225a9cfffaa4.png"
+  },
+  "shelfmark": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/shelfmark.png",
+    "icon": "upload:8bd6a048a455061be11b68f64cb8c42d70880056a018450ad10e164694003482.png"
+  },
+  "copyparty": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/copyparty.png",
+    "icon": "upload:9d8cbfe6381f1d64e053a37b4854ef9833617d65179f32aef6c6467ce923e546.png"
+  },
+  "dockhand": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/dockhand.png",
+    "icon": "upload:93ead786c9ae4eeb296dc8e039559732c0716b913c0129b8fc6b55040dd3256c.png"
+  },
+  "houndarr": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/houndarr.png",
+    "icon": "upload:837a4f6ebef57cbee67c3e77732effb687d0b6f63536a8aac7337f0ca573ebf2.png"
+  },
+  "gluetun": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/gluetun.png",
+    "icon": "upload:9f1c7b9d14df2959625cb07cfd8432a150ef03407e3c552c85523e1df73e1dc0.png"
+  },
+  "recyclarr": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/recyclarr.png",
+    "icon": "upload:dad4cea66ef850d6c71fa65e019232fa181650f17840a00e04605b18fc2869af.png"
+  },
+  "adguard-sync": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/adguard-home-sync.png",
+    "icon": "upload:a811d80f4ebe76b4aa0d358c65e4234bb3a89417aad611ad494382ae84c18387.png"
+  },
+  "unas": {
+    "source": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/png/unifi-drive.png",
+    "icon": "upload:6c2f0c9a00df60be39dc7587a3bb3813949822e109556a7e2b50ead74c8bbe82.png"
+  },
+  "grimmory": {
+    "source": "http://grimmory:4206/icons/icon-192x192.png",
+    "icon": "upload:8656bc699b0e15e1421d830e90105e96e2a123e3cfbde66feb4c4748b7a40219.png"
+  },
+  "clipcascade": {
+    "source": "http://clipcascade:8080/assets/images/logo.png",
+    "icon": "upload:91a982dde42776623f9687dec3a343e10caa0ec5bf2c2d86bc99f3f58bf2281e.png"
+  },
+  "convert": {
+    "source": "http://convert:80/convert/assets/favicon-Bfod-rsk.ico",
+    "icon": "upload:dc8e94d714da71db4b6ace4509dc19c4adc4492406181777eb5fad772a10b1c2.png"
+  },
+  "manavault": {
+    "source": "http://manavault:4000/images/logo.png",
+    "icon": "upload:a05dc63406ccf87de036f4eeba5780668c7e6fa8c5501aaf446fb74699e6889a.png"
+  },
+  "nimotsu": {
+    "source": "http://nimotsu:8080/apple-touch-icon.png",
+    "icon": "upload:548aa92d61c6d21ff98cafbea5521df4f98e25b4ab8bd1355d5acea1cb85b3fe.png"
+  },
+  "bookbridge": {
+    "source": "http://bookbridge:5757/static/icon.png",
+    "icon": "upload:806b2252724a5771129e91046c182e5acd2984629ece84897fdf9a10a6fe469c.png"
+  },
+  "gathering": {
+    "source": "http://10.0.69.189:4000/images/apple-touch-icon.png",
+    "icon": "upload:79ccbbc5c65686d74159b81dd662e77142e3d62a5e3064ae6dba0b4990a99c09.png"
+  },
+  "fladder": {
+    "source": "http://10.0.69.254:80/icons/Icon-192.png",
+    "icon": "upload:79355b7159927ac87f02f9e537103d437a4d748ff059feeb9990f06fad88bfb1.png"
+  },
+  "kvm": {
+    "source": "http://10.0.69.45:80/share/apple-touch-icon.png",
+    "icon": "upload:6d5bf2c7500353e1da1f66d996c46faf9dabc4530c130a2b957f6004fa8937e0.png"
+  }
+}

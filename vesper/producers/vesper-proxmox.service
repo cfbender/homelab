@@ -1,0 +1,15 @@
+[Unit]
+Description=Report Proxmox health to Vesper independently of Kuma
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+ExecStart=/usr/bin/python3 /usr/local/lib/vesper/proxmox-health.py --send
+# An unhealthy observation is data, not a failed systemd unit that monitors itself.
+SuccessExitStatus=3
+TimeoutStartSec=90
+TimeoutStopSec=5
+KillMode=control-group

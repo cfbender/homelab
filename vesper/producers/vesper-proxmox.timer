@@ -1,0 +1,11 @@
+[Unit]
+Description=Report Proxmox health to Vesper every five minutes
+
+[Timer]
+# Offset from Kuma's two-minute boot delay; never replace Kuma's timer.
+OnBootSec=3min
+OnUnitActiveSec=5min
+AccuracySec=15s
+
+[Install]
+WantedBy=timers.target

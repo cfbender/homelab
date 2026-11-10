@@ -33,6 +33,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Sonarr](https://sonarr.tv/) - A PVR for Usenet and BitTorrent users.
 - [Bazarr](https://www.bazarr.media/) - A companion to Sonarr and Radarr that manages and downloads subtitles.
 - [Recyclarr](https://recyclarr.dev/) - A configuration manager/syncer for radarr/sonarr
+- [Packrat](https://github.com/cfbender/packrat) - A Magic: The Gathering booster pack simulator with sealed-product expected-value statistics.
 - [IT-Tools](https://it-tools.tech/) - A collection of useful tools for developers.
 - [Copyparty](https://github.com/copyparty/copyparty) - A file sharing server.
 - [ClipCascade](https://github.com/sathvikrao/clipcascade) - A self-hosted clipboard manager.
@@ -42,7 +43,7 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Shelfmark](https://github.com/calibrain/shelfmark) - A self-hosted library manager for your ebooks.
 - [Gluetun](https://github.com/qdm12/gluetun) - VPN client in a Docker container for multiple VPN providers. *
 - [The Gathering](https://github.com/cfbender/the-gathering) - A self-hosted Magic: The Gathering playgroup and collection manager.
-- [Uptime Kuma](https://github.com/louislam/uptime-kuma) - A fancy self-hosted monitoring tool.
+- [Vesper](https://github.com/cfbender/vesper) - Machine-grouped monitoring and Telegram alerts; deployed separately via [the Vesper stack](vesper/README.md).
 - [cloudflared](https://github.com/cloudflare/cloudflared) - Cloudflare Tunnel connector; public traffic reaches Traefik through it instead of a port forward. *
 
 *not exposed

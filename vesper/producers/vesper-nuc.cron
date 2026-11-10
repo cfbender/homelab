@@ -1,0 +1,3 @@
+# Vesper NUC producer: run as cfb every minute; leave other crontab entries intact.
+# A 45-second deadline plus five-second kill grace fits the 120-second heartbeat deadline.
+* * * * * /usr/bin/flock -n /home/cfb/code/github/homelab/data/vesper-nuc.lock /usr/bin/timeout --kill-after=5s 45s /usr/bin/env PATH=/usr/local/bin:/usr/bin:/bin:/snap/bin /usr/bin/python3 -B /home/cfb/code/github/homelab/vesper/producers/host-health.py --send 2>&1 | /usr/bin/logger -t vesper-nuc

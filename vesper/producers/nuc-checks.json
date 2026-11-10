@@ -1,0 +1,12 @@
+[
+  {"path": "nuc/docker-traefik/kuma-53", "kind": "docker", "target": "traefik"},
+  {"path": "nuc/authelia-web/kuma-54", "kind": "docker", "target": "authelia"},
+  {"path": "nuc/docker-mariadb/kuma-55", "kind": "docker", "target": "mariadb"},
+  {"path": "nuc/docker-gluetun/kuma-56", "kind": "docker", "target": "gluetun"},
+  {"path": "nuc/mqtt/kuma-57", "kind": "docker", "target": "mosquitto"},
+  {"path": "nuc/docker-recyclarr/kuma-58", "kind": "docker", "target": "recyclarr"},
+  {"path": "nuc/adguard-web/kuma-59", "kind": "docker", "target": "adguard-sync"},
+  {"path": "nuc/cloudflare-tunnel/kuma-69", "kind": "docker", "target": "cloudflared"},
+  {"path": "nuc/adguard-web/kuma-47", "kind": "dns", "target": "10.0.69.69", "hostname": "home.cfb.dev"},
+  {"path": "replica/web/kuma-48", "kind": "dns", "target": "10.0.69.70", "hostname": "home.cfb.dev"}
+]

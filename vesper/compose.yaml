@@ -1,0 +1,69 @@
+# Separate, opt-in stack. Never include this file in the main homelab deployment.
+name: vesper-shadow
+
+services:
+  vesper:
+    image: ghcr.io/cfbender/vesper:latest
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    pids_limit: 256
+    mem_limit: 512m
+    stop_grace_period: 20s
+    tmpfs:
+      - /tmp:size=16m,mode=1777,noexec,nosuid,nodev
+    environment:
+      VESPER_PUBLIC_URL: https://vesper.cfb.dev
+      VESPER_TRUSTED_PROXIES: 172.20.69.20/32
+      VESPER_CONFIG_READ_ONLY: "true"
+    volumes:
+      - type: bind
+        source: ../../home-config/vesper
+        target: /config
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ../data/vesper
+        target: /data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ../secrets/vesper
+        target: /run/secrets
+        read_only: true
+        bind:
+          create_host_path: false
+    networks: [homelab]
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: homelab_default
+      traefik.http.services.vesper-shadow.loadbalancer.server.port: "8080"
+      traefik.http.routers.vesper-shadow.rule: Host(`vesper.cfb.dev`)
+      traefik.http.routers.vesper-shadow.entrypoints: websecure
+      traefik.http.routers.vesper-shadow.tls.certresolver: prod
+      traefik.http.routers.vesper-shadow.middlewares: hsts-header@docker,authelia@docker
+      traefik.http.routers.vesper-shadow.service: vesper-shadow
+      # Only scoped POST heartbeats bypass interactive login; bearer auth remains.
+      traefik.http.routers.vesper-shadow-heartbeat.rule: Host(`vesper.cfb.dev`) && Method(`POST`) && PathRegexp(`^/api/heartbeat/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+$$`)
+      traefik.http.routers.vesper-shadow-heartbeat.priority: "1000"
+      traefik.http.routers.vesper-shadow-heartbeat.entrypoints: websecure
+      traefik.http.routers.vesper-shadow-heartbeat.tls.certresolver: prod
+      traefik.http.routers.vesper-shadow-heartbeat.service: vesper-shadow
+      traefik.http.routers.vesper-shadow-heartbeat.middlewares: hsts-header@docker,vesper-shadow-lan,vesper-shadow-rate,vesper-shadow-body
+      traefik.http.middlewares.vesper-shadow-lan.ipallowlist.sourcerange: 10.0.69.0/24
+      traefik.http.middlewares.vesper-shadow-rate.ratelimit.average: "60"
+      traefik.http.middlewares.vesper-shadow-rate.ratelimit.period: 1m
+      traefik.http.middlewares.vesper-shadow-rate.ratelimit.burst: "30"
+      traefik.http.middlewares.vesper-shadow-body.buffering.maxRequestBodyBytes: "1024"
+
+networks:
+  homelab:
+    external: true
+    name: homelab_default
