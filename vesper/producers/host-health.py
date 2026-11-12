@@ -54,7 +54,7 @@ def probe(check):
             command = ["docker", "inspect", "--format", "{{json .State}}", target]
         elif kind == "dns":
             command = ["dig", f"@{target}", check["hostname"], "A",
-                       "+time=3", "+tries=1", "+noall", "+comments", "+answer"]
+                       "+time=3", "+tries=2", "+noall", "+comments", "+answer"]
         elif kind == "ping":
             command = ["ping", "-n", "-c", "1", "-W", "3", "-w", "5", target]
         else:

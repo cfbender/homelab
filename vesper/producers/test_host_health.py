@@ -17,12 +17,16 @@ SCRIPT = Path(__file__).with_name("host-health.py")
 
 
 class HostHealthTests(unittest.TestCase):
-    def run_probe(self, kind, output, code=0):
+    def run_probe(self, kind, output, code=0, argv_out=None):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             command = root / {"docker": "docker", "dns": "dig", "ping": "ping"}[kind]
+            argv_capture = (
+                f"import json; open({str(argv_out)!r}, 'w').write(json.dumps(sys.argv[1:]))\n"
+                if argv_out is not None else ""
+            )
             command.write_text(
-                f"#!{sys.executable}\nimport sys\nprint({output!r})\nsys.exit({code})\n"
+                f"#!{sys.executable}\nimport sys\n{argv_capture}print({output!r})\nsys.exit({code})\n"
             )
             command.chmod(0o700)
             checks = root / "checks.json"
@@ -55,6 +59,9 @@ class HostHealthTests(unittest.TestCase):
 
     def test_dns_requires_success_and_an_a_answer(self):
         good = ";; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 1\nservice.test. 10 IN A 10.0.0.7"
+        with tempfile.NamedTemporaryFile() as captured:
+            self.assertTrue(self.run_probe("dns", good, argv_out=captured.name))
+            self.assertIn("+tries=2", json.loads(Path(captured.name).read_text()))
         for output, expected in [
             (good, True),
             (good.replace("NOERROR", "NXDOMAIN"), False),
