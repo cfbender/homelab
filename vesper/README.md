@@ -51,7 +51,7 @@ Traefik's retained 4xx-only access log contains no corresponding rejected reques
 
 The entries below record the pre-cutover state. References to notifications being off, Kuma owning alerts, or preserving its running timer apply to those historical steps, not the current ownership and retirement above.
 
-- [Complete monitor mapping](monitor-mapping.md): 60 configured checks plus three deliberately deferred Kuma monitors, their Vesper IDs, semantic differences and missing coverage.
+- [Complete monitor mapping](monitor-mapping.md): 58 configured checks plus three deliberately deferred Kuma monitors, their Vesper IDs, semantic differences and missing coverage.
 - `../home-config/vesper/` (relative to the homelab repository root): authoritative machine-keyed YAML, moved unchanged from `vesper/config/` and mounted read-only at `/config`. Checks run every 30 seconds, with three failures/two passes. Telegram is absent and every service has `notifications: false`.
 - `compose.yaml`: existing Traefik + Authelia for this homelab, no published ports or Docker socket, exact proxy trust `172.20.69.20/32`, read-only configuration, non-root UID/GID 10001, and narrowly scoped LAN-only bearer heartbeat routes.
 - `rollout.env`: pinned GHCR digest for source revision `fcf3e46bf9df8288affcf62cd1cf41601b946106` (linux/amd64), verified by [the image's publishing CI](https://github.com/cfbender/vesper/actions/runs/42845693321) and a pull on this Docker host. The package is public; anonymous manifest/config verification passed and no registry login is required.

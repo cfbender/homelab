@@ -1,7 +1,7 @@
 [
   {"path": "nuc/docker-traefik/kuma-53", "kind": "docker", "target": "traefik"},
   {"path": "nuc/authelia-web/kuma-54", "kind": "docker", "target": "authelia"},
-  {"path": "nuc/docker-mariadb/kuma-55", "kind": "docker", "target": "mariadb"},
+  {"path": "nuc/grimmory/kuma-55", "kind": "docker", "target": "mariadb"},
   {"path": "nuc/docker-gluetun/kuma-56", "kind": "docker", "target": "gluetun"},
   {"path": "nuc/mqtt/kuma-57", "kind": "docker", "target": "mosquitto"},
   {"path": "nuc/docker-recyclarr/kuma-58", "kind": "docker", "target": "recyclarr"},

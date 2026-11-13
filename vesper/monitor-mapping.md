@@ -1,8 +1,12 @@
 # Kuma → Vesper monitor mapping
 
+## Service removals and regrouping — 2026-11-13
+
+Dashy and ClipCascade were removed from the stack, along with their checks, `nuc/dashy` (28) and `nuc/clipcascade` (8). MariaDB's runtime push check (55) moved from its own `nuc/docker-mariadb` service to `nuc/grimmory`, because MariaDB holds only Grimmory's `booklore` database. Its producer path is now `nuc/grimmory/kuma-55`; its token and thresholds are unchanged. Vesper now validates **58 checks across 40 services** on four machines. Older counts below are historical.
+
 ## Current alert ownership — 2026-11-10
 
-Vesper is now the alerting authority for the **60 mapped checks across 43 services**, with Telegram configured and every service's notifications enabled. The existing Kuma bot/chat credentials were transferred directly into restricted secret files without displaying their values. Telegram accepted Vesper's test at 16:19:28 UTC; this is API acceptance, not a read receipt. The owner separately confirmed successful production use.
+Vesper is now the alerting authority for the **58 mapped checks across 40 services** (60 across 43 before the 2026-11-13 changes), with Telegram configured and every service's notifications enabled. The existing Kuma bot/chat credentials were transferred directly into restricted secret files without displaying their values. Telegram accepted Vesper's test at 16:19:28 UTC; this is API acceptance, not a read receipt. The owner separately confirmed successful production use.
 
 Kuma is retired with the owner's approval. The three remaining checks, **www (2), gateway (50) and internet (51)**, were deleted through its API; their coverage is deliberately absent until the networking layer is added. Its container and Compose service were removed, and its Proxmox timer was disabled/stopped. Vesper's producers and Telegram alerts remain active. All 33 remaining containers kept their identities/start times/restart counts; Kuma's old URL now returns 404. Stable Vesper `kuma-*` IDs are retained to preserve history.
 
@@ -12,7 +16,7 @@ The earlier Proxmox incident followed five failed heartbeat deliveries at 14:54 
 
 ## Historical shadow inventory and verification
 
-The 60 Vesper destinations below remain current. Statements about notifications being disabled, Kuma owning alerts, the three deferred monitors remaining in Kuma, or preserving its running timer describe the earlier shadow stages and are superseded by the retirement above.
+The Vesper destinations below remain current, apart from the 2026-11-13 changes noted in their rows. Statements about notifications being disabled, Kuma owning alerts, the three deferred monitors remaining in Kuma, or preserving its running timer describe the earlier shadow stages and are superseded by the retirement above.
 
 Prepared 2026-11-10 from the live Kuma SQLite database opened read-only, local Traefik routing, Docker inventory, and `scripts/proxmox-health-push.sh`. Vesper was subsequently deployed alongside Kuma with approval that day. No Kuma monitor, notification, producer, or existing running service was changed.
 
@@ -54,7 +58,7 @@ Public service hostnames use the existing LAN split-DNS path and do not prove Cl
 | 5 | Grimmory (books) | HTTP | `nuc/grimmory` | Candidate |
 | 6 | Seerr (request) | HTTP | `nuc/seerr` | Candidate |
 | 7 | IT-Tools | HTTP | `nuc/tools` | Candidate |
-| 8 | ClipCascade | HTTP | `nuc/clipcascade` | Candidate |
+| 8 | ClipCascade | HTTP | — | Removed 2026-11-13 with the service |
 | 9 | Convert | HTTP | `nuc/convert` | Candidate |
 | 10 | ManaVault | HTTP | `nuc/manavault` | Candidate |
 | 11 | ManaVault demo | HTTP | `nuc/manavault` | Candidate |
@@ -73,7 +77,7 @@ Public service hostnames use the existing LAN split-DNS path and do not prove Cl
 | 25 | Shelfmark | HTTP | `nuc/shelfmark` | Candidate; gluetun network namespace |
 | 26 | Copyparty | HTTP | `nuc/copyparty` | Candidate |
 | 27 | code-server | HTTP | `nuc/code-server` | Candidate; configured 8843 verified HTTP 200 |
-| 28 | Dashy | HTTP | `nuc/dashy` | Candidate |
+| 28 | Dashy | HTTP | — | Removed 2026-11-13 with the service |
 | 29 | ESPHome | HTTP | `nuc/esphome` | Candidate; host-network endpoint |
 | 30 | Dockhand | HTTP | `nuc/dockhand` | Candidate |
 | 31 | BookBridge | HTTP | `nuc/bookbridge` | Candidate |
@@ -97,7 +101,7 @@ Public service hostnames use the existing LAN split-DNS path and do not prove Cl
 | 51 | Internet (1.1.1.1) | ICMP | — | Deferred networking layer; remains in Kuma |
 | 53 | traefik | Docker | `nuc/docker-traefik` | Active producer |
 | 54 | authelia | Docker | `nuc/authelia-web` | Active producer |
-| 55 | mariadb | Docker | `nuc/docker-mariadb` | Active producer |
+| 55 | mariadb | Docker | `nuc/grimmory` | Active producer; moved from `nuc/docker-mariadb` 2026-11-13 |
 | 56 | gluetun | Docker | `nuc/docker-gluetun` | Active producer |
 | 57 | mosquitto | Docker | `nuc/mqtt` | Active producer |
 | 58 | recyclarr | Docker | `nuc/docker-recyclarr` | Active producer |
