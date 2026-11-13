@@ -223,33 +223,6 @@ services:
       retries: 3
       start_period: 10s
 
-  #https://github.com/Lissy93/dashy
-  dashy:
-    image: lissy93/dashy:latest
-    container_name: dashy
-    restart: unless-stopped
-    environment:
-      TZ: ${TZ}
-      NODE_ENV: production
-    ports:
-      - 8081:8080/tcp
-    volumes:
-      - ${CONFIG_DIR}/dashy/dashy-conf.yml:/app/public/conf.yml
-    healthcheck:
-      test: ["CMD", "node", "/app/services/healthcheck"]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: homelab_default
-      traefik.http.routers.dashy.tls.certresolver: prod
-      traefik.http.routers.dashy.rule: Host(`${DASHY_HOST}`)
-      traefik.http.routers.dashy.middlewares: hsts-header, authelia
-      traefik.http.services.dashy.loadbalancer.server.port: 8080
-      traefik.http.services.dashy.loadbalancer.server.scheme: http
-
   #https://github.com/cfbender/edison
   # edison:
   #   container_name: edison
@@ -520,30 +493,6 @@ services:
       traefik.http.routers.copyparty.middlewares: hsts-header, authelia
       traefik.http.routers.copyparty.rule: Host(`${COPYPARTY_HOST}`)
       traefik.http.services.copyparty.loadbalancer.server.port: 3923
-
-  clipcascade:
-    image: sathvikrao/clipcascade:latest
-    container_name: clipcascade
-    restart: unless-stopped
-    volumes:
-      - ${DATA_DIR}/cc_users:/database # Persistent storage for user data
-    environment:
-      - CC_MAX_MESSAGE_SIZE_IN_MiB=10 # Maximum message size in MiB (ignored if P2P mode is enabled)
-      - CC_P2P_ENABLED=false # Enables or disables peer-to-peer(P2P) mode
-      - CC_ALLOWED_ORIGINS=https://clip.cfb.dev # Defines allowed CORS origins for security
-      - CC_SIGNUP_ENABLED=false # Enables or disables user self-registration
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.clipcascade.tls.certresolver: prod
-      traefik.http.routers.clipcascade.middlewares: hsts-header
-      traefik.http.routers.clipcascade.rule: Host(`${CLIPCASCADE_HOST}`)
-      traefik.http.services.clipcascade.loadbalancer.server.port: 8080
 
   #https://github.com/cporcellijr/bookbridge
   bookbridge:

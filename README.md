@@ -23,7 +23,6 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [adguardhome-sync](https://github.com/bakito/adguardhome-sync)- Synchronize AdGuardHome config to a replica instance. *
 - [Authelia](https://www.authelia.com/) - The Single Sign-On Multi-Factor portal for web apps.
 - [mosquitto](https://mosquitto.org/) - an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. *
-- [dashy](https://github.com/Lissy93/dashy) - 🚀 A self-hostable personal dashboard built for you. Includes status-checking, widgets, themes, icon packs, a UI editor and tons more!
 - [edison](https://github.com/cfbender/edison) - a little discord bot I run for some random tasks *
 - [Homebox](https://github.com/hay-kot/homebox) - An inventory and organization system for your home.
 - [Booklore](https://github.com/booklore-app/booklore) - A self-hosted eBook library manager and reader.
@@ -36,7 +35,6 @@ Clone this repo, or fork it first if you want to! Be sure to install the pre-com
 - [Packrat](https://github.com/cfbender/packrat) - A Magic: The Gathering booster pack simulator with sealed-product expected-value statistics.
 - [IT-Tools](https://it-tools.tech/) - A collection of useful tools for developers.
 - [Copyparty](https://github.com/copyparty/copyparty) - A file sharing server.
-- [ClipCascade](https://github.com/sathvikrao/clipcascade) - A self-hosted clipboard manager.
 - [BookBridge](https://github.com/cporcellijr/bookbridge) - A bridge between Audiobookshelf and KOReader.
 - [convert](https://github.com/p2r3/convert) - Truly universal online file converter
 - [Prowlarr](https://prowlarr.com/) - An indexer manager/proxy built on the popular *arr .net/reactjs base stack to integrate with your various PVR apps.

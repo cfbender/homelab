@@ -43,10 +43,6 @@
     "source": "http://grimmory:4206/icons/icon-192x192.png",
     "icon": "upload:8656bc699b0e15e1421d830e90105e96e2a123e3cfbde66feb4c4748b7a40219.png"
   },
-  "clipcascade": {
-    "source": "http://clipcascade:8080/assets/images/logo.png",
-    "icon": "upload:91a982dde42776623f9687dec3a343e10caa0ec5bf2c2d86bc99f3f58bf2281e.png"
-  },
   "convert": {
     "source": "http://convert:80/convert/assets/favicon-Bfod-rsk.ico",
     "icon": "upload:dc8e94d714da71db4b6ace4509dc19c4adc4492406181777eb5fad772a10b1c2.png"
