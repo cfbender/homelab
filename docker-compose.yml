@@ -7,6 +7,8 @@ networks:
     ipam:
       config:
         - subnet: 172.20.69.0/24
+          # Dynamic addresses stay in the upper half, clear of the pinned ones below .128.
+          ip_range: 172.20.69.128/25
 
 services:
   # https://hub.docker.com/_/traefik/
